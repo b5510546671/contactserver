@@ -83,7 +83,7 @@ public class JettyMain {
 		
 		// (2) Define the path that server should map to our context.
 		// If you use "/" it means the server root.
-		context.setContextPath("/ske");
+		context.setContextPath("/");
 		
 		// (3) Add servlets and mapping of requests to requests to servlets to the ContextHandler.
 		// The ServletContextHandler class gives you several ways to do this:
@@ -103,8 +103,8 @@ public class JettyMain {
 		// The ServletContainer javadoc tells you what the initialization parameter are.
 		// This initialization parameter tells Jersey to auto-configure all resource classes
 		// in the named package(s). 
-		holder.setInitParameter(ServerProperties.PROVIDER_PACKAGES, "greeter.resource");
-		context.addServlet( holder, "/rest/*" );
+		holder.setInitParameter(ServerProperties.PROVIDER_PACKAGES, "contact.resource");
+		context.addServlet( holder, "/contacts/*" );
 		
 
 		// (5) Add the context (our application) to the Jetty server.

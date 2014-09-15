@@ -1,38 +1,40 @@
 package contact.resource;
 
-import java.util.List;
+import java.util.*;
 
 import javax.ws.rs.*;
 
 /**
- * 
+ * A Data Access Object class.
+ * The separated class to handle CRUD operatons.
  * @author Supavit 5510546671
  *
  */
 
 public class ContactDao {
-	@GET
-	@Path("/contacts/{id}")
-	public Contact find(@PathParam("id") long id){
+	
+	private Contact contact;
+	
+	public ContactDao(){
 		
 	}
-	@GET
-	@Path("/contacts")
+	
+	public Contact find(long id){
+		return null;
+	}
+	
 	public List<Contact> findAll(){
-		
+		return null;
 	}
-	@DELETE
-	@Path("/contacts/{id}")
-	public void delete(@PathParam("id") long id){
-		
+	
+	public void delete(long id){
+		System.out.println("invoking delete");
 	}
-	@POST
-	@Path("/contacts")
+	
 	public void save(Contact contact){
 		
 	}
-	@PUT
-	@Path("/contacts/{id}")
+	
 	public void update(Contact contact){
 		
 	}
