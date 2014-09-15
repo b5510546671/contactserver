@@ -6,7 +6,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 
-//import greeter.resource.HelloResource;
+import contact.resource.ContactResource;
 
 /**
  * <p>
@@ -61,7 +61,7 @@ public class JettyMain {
 	/** The default port to listen on. Typically 80 or 8080.  
 	 * On Ubuntu or MacOS if you are not root then you must use a port > 1024.
 	 */
-	static final int PORT = 8888;
+	static final int PORT = 8080;
 
 	/**
 	 * Create a Jetty server and a context, add Jetty ServletContainer
