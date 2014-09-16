@@ -21,7 +21,7 @@ public class ContactDao {
 	public ContactDao() {
 		contacts = new ArrayList<Contact>();
 		nextId = new AtomicLong(1000L);
-		createTestContact(1);
+		//createTestContact(1);
 	}
 	
 	/** add a single contact with given id for testing. */
