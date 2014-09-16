@@ -4,6 +4,8 @@ import java.util.*;
 
 import javax.ws.rs.*;
 
+import contact.entity.Contact;
+
 /**
  * A Data Access Object class.
  * The separated class to handle CRUD operatons.
