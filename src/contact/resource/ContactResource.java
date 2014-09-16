@@ -62,25 +62,37 @@ public class ContactResource {
 	@Consumes(MediaType.APPLICATION_XML)
 	public Response createContact(JAXBElement<Contact> element, @Context UriInfo uriInfo){
 		Contact contact = element.getValue();
-		dao.save(contact);
-		URI uri = uriInfo.getAbsolutePath();
-		return Response.ok().header("Location", uriInfo).build();
+		if( dao.save(contact) ){
+			URI uri = uriInfo.getAbsolutePath();
+			return Response.ok().header("Location", uriInfo).build();
+		}
+		else{
+			return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
+		}
 		
+	
 	}
 	@PUT
 	@Path("{id}")
 	public Response updateContact(@PathParam("id") long id, JAXBElement<Contact> element){
 
 		Contact contact = element.getValue();
-		dao.update(contact);
-		return Response.ok().header("Location", uriInfo).build();
+		
+		if(dao.update(contact)){
+			return Response.ok().header("Location", uriInfo).build();
+		}
+		else{
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+		
 	}
 	@DELETE
 	@Path("{id}")
 	public Response deleteContact(@PathParam("id") long id){
-//		ContactDao dao = new ContactDao();
-		dao.delete(id);
-		return Response.ok("Deleted").build();
+		if(dao.delete(id)) return Response.ok("Deleted").build();
+		else{
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
 	}
 	
 }
