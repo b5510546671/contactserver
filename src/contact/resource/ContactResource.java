@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.*;
 
 import javax.inject.Singleton;
+import javax.persistence.Entity;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
@@ -20,7 +21,7 @@ import contact.service.ContactDao;
  * @author Supavit 5510546671
  *
  */
-@Path("/contacts")
+@Path("/contact")
 @Singleton
 public class ContactResource {
 	
@@ -37,7 +38,12 @@ public class ContactResource {
 		
 		List<Contact> contactList = dao.findAll();
 		GenericEntity<List<Contact>> entity = new GenericEntity<List<Contact>>(contactList){};
-		return Response.ok(entity).build();
+		if(entity != null){
+			return Response.ok(entity).build();
+		}
+		else{
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
 	}
 	
 	@GET
@@ -45,7 +51,12 @@ public class ContactResource {
 	@Produces(MediaType.APPLICATION_XML)
 	public Response getContact(@PathParam("id") long id){
 		Contact contact = dao.find(id);
-		return Response.ok(contact).build();
+		if(contact == null){
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+		else{
+			return Response.ok(contact).build();
+		}
 	}
 	
 	@GET
@@ -53,23 +64,33 @@ public class ContactResource {
 	public Response getContact(@QueryParam("q") String q){
 		
 		if ( q == null ) return getContacts();
-		
+				
 		List<Contact> contactlist = dao.search(q);
 		GenericEntity<List<Contact>> entity = new GenericEntity<List<Contact>>(contactlist){};
-		return Response.ok(entity).build();
+		if(entity != null){
+			return Response.ok(entity).build();
+		}
+		else{
+			return Response.status(Response.Status.NOT_FOUND).build();
+
+		}
 	}
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
 	public Response createContact(JAXBElement<Contact> element, @Context UriInfo uriInfo){
 		Contact contact = element.getValue();
-		if( dao.save(contact) ){
-			URI uri = uriInfo.getAbsolutePath();
-			return Response.ok().header("Location", uriInfo).build();
+		if(dao.find(contact.getId()) == null){
+			if( dao.save(contact) ){
+				URI uri = uriInfo.getAbsolutePath();
+				return Response.created(uri).build();
+			}
+			else{
+				return Response.status(Response.Status.BAD_REQUEST).build();
+			}
 		}
 		else{
-			return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
+			return Response.status(Response.Status.CONFLICT).build();
 		}
-		
 	
 	}
 	@PUT
