@@ -17,14 +17,17 @@ import contact.entity.Contact;
 import contact.service.ContactDao;
 
 /**
+ * A class that manages getting, creating, updating, and deleting contacts.
+ * It responses using HTTP status codes.
  * 
  * @author Supavit 5510546671
- *
+ * @version 2014.09.16
  */
 @Path("/contact")
 @Singleton
 public class ContactResource {
 	
+	/** DAO that manages saving and getting contacts. */
 	private ContactDao dao = new ContactDao();
 	
 	@Context
@@ -34,6 +37,10 @@ public class ContactResource {
 		System.out.println("Initializing ContactResource");
 	}
 	
+	/**
+	 * Get all contacts.
+	 * @return HTTP status code
+	 */
 	public Response getContacts(){
 		
 		List<Contact> contactList = dao.findAll();
@@ -46,6 +53,11 @@ public class ContactResource {
 		}
 	}
 	
+	/**
+	 * Get contacts using id.
+	 * @param id the id to search
+	 * @return HTTP status code
+	 */
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_XML)
@@ -59,6 +71,11 @@ public class ContactResource {
 		}
 	}
 	
+	/**
+	 * Get contacts using query string
+	 * @param q the query string to search
+	 * @return HTTP status code
+	 */
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
 	public Response getContact(@QueryParam("q") String q){
@@ -75,6 +92,13 @@ public class ContactResource {
 
 		}
 	}
+	
+	/**
+	 * Create contact.
+	 * @param element the input element
+	 * @param uriInfo
+	 * @return HTTP status code
+	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
 	public Response createContact(JAXBElement<Contact> element, @Context UriInfo uriInfo){
@@ -93,20 +117,38 @@ public class ContactResource {
 		}
 	
 	}
+	
+	/**
+	 * Update contact.
+	 * @param id the contact id
+	 * @param element the input element
+	 * @return HTTP status code
+	 */
 	@PUT
 	@Path("{id}")
 	public Response updateContact(@PathParam("id") long id, JAXBElement<Contact> element){
 
 		Contact contact = element.getValue();
-		
-		if(dao.update(contact)){
-			return Response.ok().header("Location", uriInfo).build();
+		if(contact.getId() == id){
+			if(dao.update(contact)){
+				return Response.ok().header("Location", uriInfo).build();
+			}
+			else{
+				return Response.status(Response.Status.NOT_FOUND).build();
+			}
 		}
 		else{
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 		
+		
 	}
+	
+	/**
+	 * Delete contact.
+	 * @param id the contact id
+	 * @return HTTP status code
+	 */
 	@DELETE
 	@Path("{id}")
 	public Response deleteContact(@PathParam("id") long id){
