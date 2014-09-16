@@ -104,7 +104,7 @@ public class JettyMain {
 		// This initialization parameter tells Jersey to auto-configure all resource classes
 		// in the named package(s). 
 		holder.setInitParameter(ServerProperties.PROVIDER_PACKAGES, "contact.resource");
-		context.addServlet( holder, "/contacts/*" );
+		context.addServlet( holder, "/*" );
 		
 
 		// (5) Add the context (our application) to the Jetty server.

@@ -40,6 +40,16 @@ public class ContactDao {
 		return null;
 	}
 
+	public List<Contact> search(String querystr){
+		List<Contact> contactlist = new ArrayList<Contact>();
+		for ( Contact contact : contacts ) {
+			 if ( contact.getTitle().contains(querystr) ){
+				 contactlist.add(contact);
+			 }
+		}
+		return contactlist;
+	}
+	
 	public List<Contact> findAll() {
 		return java.util.Collections.unmodifiableList(contacts);
 	}
