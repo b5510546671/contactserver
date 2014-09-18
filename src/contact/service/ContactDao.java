@@ -12,7 +12,7 @@ import contact.entity.Contact;
  * dao = DaoFactory.getInstance().getContactDao()
  * 
  * @author jim, Supavit 5510546671
- * @version 2014.09.16
+ * @version 2014.09.18
  */
 public class ContactDao {
 	private List<Contact> contacts;
@@ -110,6 +110,9 @@ public class ContactDao {
 	public boolean update(Contact update) {
 		Contact contact = find(update.getId());
 		if (contact == null) return false;
+		if (update.getEmail() == null || update.getName() == null || /*contact.getPhotoUrl() == null ||*/ update.getTitle() == null){
+			return false;
+		}
 		contact.applyUpdate(update);
 		save(contact);
 		return true;
