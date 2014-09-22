@@ -15,6 +15,7 @@ import javax.xml.bind.JAXBElement;
 
 import contact.entity.Contact;
 import contact.service.ContactDao;
+import contact.service.mem.MemContactDao;
 
 /**
  * A class that manages getting, creating, updating, and deleting contacts.
@@ -28,7 +29,7 @@ import contact.service.ContactDao;
 public class ContactResource {
 	
 	/** DAO that manages saving and getting contacts. */
-	private ContactDao dao = new ContactDao();
+	private ContactDao dao = new MemContactDao();
 	
 	/**
 	 * URI information.

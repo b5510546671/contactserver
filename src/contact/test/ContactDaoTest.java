@@ -4,10 +4,12 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import java.util.List;
 
 import contact.entity.Contact;
 import contact.service.ContactDao;
+import contact.service.mem.MemContactDao;
 
 public class ContactDaoTest {
 	ContactDao dao;
@@ -18,7 +20,7 @@ public class ContactDaoTest {
 	@Before
 	public void setUp() {
 		// create a new DAO for each test and create some sample contacts
-		dao = new ContactDao();
+		dao = new MemContactDao();
 		contact1 = new Contact("contact1", "Joe Contact", "joe@microsoft.com");
 		contact2 = new Contact("contact2", "Sally Contract", "sally@foo.com");
 		contact3 = new Contact("contact3", "Foo Bar", "foo@barclub.com");
