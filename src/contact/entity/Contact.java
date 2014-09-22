@@ -11,6 +11,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  * A person is a contact with a name, title, and email.
  * title is text to display for this contact in a list of contacts,
  * such as a nickname or company name.
+ * 
+ *@author Supavit 5510546671
+ *@version 2014.09.22
+ * 
  */
 @XmlRootElement(name="contact")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -104,11 +108,15 @@ public class Contact implements Serializable {
 		if (update.getId() != 0 && update.getId() != this.getId() )
 			throw new IllegalArgumentException("Update contact must have same id as contact to update");
 		// Since title is used to display contacts, don't allow empty title
-		if (! isEmpty( update.getTitle()) ) this.setTitle(update.getTitle()); // empty nickname is ok
+//		if (! isEmpty( update.getTitle()) ) this.setTitle(update.getTitle()); // empty nickname is ok
 		// other attributes: allow an empty string as a way of deleting an attribute in update (this is hacky)
-		if (update.getName() != null ) this.setName(update.getName()); 
-		if (update.getEmail() != null) this.setEmail(update.getEmail());
-		if (update.getPhotoUrl() != null) this.setPhotoUrl(update.getPhotoUrl());
+//		if (update.getName() != null ) this.setName(update.getName()); 
+//		if (update.getEmail() != null) this.setEmail(update.getEmail());
+//		if (update.getPhotoUrl() != null) this.setPhotoUrl(update.getPhotoUrl());
+		this.setName(update.getName());
+		this.setEmail(update.getEmail());
+		this.setPhotoUrl(update.getPhotoUrl());
+		this.setTitle(update.getTitle());
 	}
 	
 	/**
