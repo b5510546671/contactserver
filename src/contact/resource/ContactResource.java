@@ -21,7 +21,7 @@ import contact.service.ContactDao;
  * It replies using HTTP status codes responses.
  * 
  * @author Supavit 5510546671
- * @version 2014.09.16
+ * @version 2014.09.22
  */
 @Path("/contacts")
 @Singleton
@@ -80,16 +80,16 @@ public class ContactResource {
 	
 	/**
 	 * Get contacts from database using query string.
-	 * @param q the query string to search
+	 * @param title the query string to search
 	 * @return HTTP status code  OK or not found
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
-	public Response getContact(@QueryParam("q") String q){
+	public Response getContact(@QueryParam("title") String title){
 		System.out.println("Get contact using query param was called");
-		if ( q == null ) return getContacts();
+		if ( title == null ) return getContacts();
 				
-		List<Contact> contactlist = dao.search(q);
+		List<Contact> contactlist = dao.search(title);
 		GenericEntity<List<Contact>> entity = new GenericEntity<List<Contact>>(contactlist){};
 		if(entity != null){
 			return Response.ok(entity).build();

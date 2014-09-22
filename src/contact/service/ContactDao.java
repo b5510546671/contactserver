@@ -49,7 +49,7 @@ public class ContactDao {
 	public List<Contact> search(String querystr){
 		List<Contact> contactlist = new ArrayList<Contact>();
 		for ( Contact contact : contacts ) {
-			 if ( contact.getTitle().contains(querystr) ){
+			 if ( contact.getTitle().toLowerCase().contains(querystr.toLowerCase()) ){
 				 contactlist.add(contact);
 			 }
 		}
