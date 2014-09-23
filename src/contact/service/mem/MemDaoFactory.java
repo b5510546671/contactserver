@@ -3,6 +3,7 @@ package contact.service.mem;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
@@ -10,6 +11,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import contact.entity.Contact;
+import contact.entity.ContactList;
 import contact.service.ContactDao;
 import contact.service.DaoFactory;
 import contact.service.jpa.JpaDaoFactory;
@@ -57,12 +59,13 @@ public class MemDaoFactory extends DaoFactory {
 			for(Contact ctc : daoInstance.findAll()){
 				System.out.println(ctc.getName());
 			}
-			Contact contact = daoInstance.findAll().get(0);
+			ContactList contactList = new ContactList();
+			contactList.setContactList(daoInstance.findAll());
 			File file = new File("C://Users/knotsupavit/Desktop/build.xml");
 			FileOutputStream fileoutput = new FileOutputStream(file);
-			Marshaller jaxbMarshaller = JAXBContext.newInstance(Contact.class).createMarshaller();
+			Marshaller jaxbMarshaller = JAXBContext.newInstance(ContactList.class).createMarshaller();
 			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			jaxbMarshaller.marshal(contact, fileoutput);
+			jaxbMarshaller.marshal(contactList, fileoutput);
 		}catch(JAXBException ex){
 			System.out.println("Error");
 			Logger.getLogger(MemDaoFactory.class.getName()).warning(ex.getMessage());

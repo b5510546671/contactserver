@@ -1,7 +1,12 @@
 package contact.service.mem;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 import contact.entity.Contact;
 import contact.service.ContactDao;
@@ -13,18 +18,36 @@ import contact.service.ContactDao;
  * dao = DaoFactory.getInstance().getContactDao()
  * 
  * @author jim, Supavit 5510546671
- * @version 2014.09.22
+ * @version 2014.09.23
  */
 public class MemContactDao implements ContactDao {
 	private List<Contact> contacts;
 	private AtomicLong nextId;
 	
 	public MemContactDao() {
+		getSavedContacts();
 		contacts = new ArrayList<Contact>();
 		nextId = new AtomicLong(1000L);
 		//createTestContact(1);
 	}
 	
+	private void getSavedContacts() {
+//		try {
+//			JAXBContext jc = JAXBContext.newInstance();
+//			Unmarshaller un = jc.createUnmarshaller();
+//			File file = new File("C://Users/knotsupavit/Desktop/build.xml");
+//			Object obj = un.unmarshal(file);
+//			Contact contactObj = (Contact)obj;
+//			for(Contact ct : contactObj){
+//				contacts.add(ct);
+//			}
+//			
+//		} catch (JAXBException e) {
+//			e.printStackTrace();
+//		}
+		
+	}
+
 	/** add a single contact with given id for testing. */
 	private void createTestContact(long id) {
 		Contact test = new Contact("Test contact", "Joe Experimental", "none@testing.com");
