@@ -1,5 +1,6 @@
 package contactserver;
 
+import java.net.URI;
 import java.net.URL;
 
 import org.eclipse.jetty.server.Server;
@@ -67,6 +68,8 @@ public class JettyMain {
 	 * On Ubuntu or MacOS if you are not root then you must use a port > 1024.
 	 */
 	static final int PORT = 8080;
+	
+	private static Server server;
 
 	/**
 	 * Create a Jetty server and a context, add Jetty ServletContainer
@@ -129,18 +132,39 @@ public class JettyMain {
 		server.stop();
 	}
 	
-	public static URL startServer( ) throws Exception{
-		int port = PORT;
-		Server server = new Server( port );
+	/**
+	 * Stop the running server.
+	 * @throws Exception
+	 */
+	public static void stopServer() throws Exception{
+		
+		if(server != null){
+			System.out.println("Stopping server.");
+			DaoFactory dao = DaoFactory.getInstance();
+			dao.shutdown();
+			server.stop();
+		}
+		
+	}
+	
+	/**
+	 * Start server on specified port.
+	 * @return url of server
+	 * @throws Exception
+	 */
+	public static String startServer(int port ) throws Exception{
+//		int port = PORT;
+		server = new Server( port );
 		ServletContextHandler context = new ServletContextHandler( ServletContextHandler.SESSIONS );
 		context.setContextPath("/");
 		ServletHolder holder = new ServletHolder( org.glassfish.jersey.servlet.ServletContainer.class );
 		holder.setInitParameter(ServerProperties.PROVIDER_PACKAGES, "contact.resource");
 		context.addServlet( holder, "/*" );
 		server.setHandler( context );
-		System.out.println("Starting Jetty server on port " + port);
+		System.out.println("Starting Jetty server on port " + PORT);
 		server.start();
-		return new URL(server.getURI() + "contacts/");
+		System.out.println("Server started.  Press ENTER to stop it.");
+		return (server.getURI() + "contacts/");
 	}
 	
 }

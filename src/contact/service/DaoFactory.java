@@ -1,4 +1,7 @@
 package contact.service;
+
+import java.io.FileNotFoundException;
+
 /**
  * DaoFactory defines methods for obtaining instance of data access objects.
  * To create DAO you first get an instance of a concrete factory by invoking
@@ -23,9 +26,10 @@ public abstract class DaoFactory {
 	/**
 	 * Get a singleton instance of the DaoFactory.
 	 * @return instance of a concrete DaoFactory
+	 * @throws FileNotFoundException 
 	 */
-	public static DaoFactory getInstance() {
-		if (factory == null) factory = new contact.service.jpa.JpaDaoFactory();
+	public static DaoFactory getInstance() throws FileNotFoundException {
+		if (factory == null) factory = new contact.service.mem.MemDaoFactory();
 		return factory;
 	}
 

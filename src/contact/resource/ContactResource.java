@@ -1,5 +1,6 @@
 package contact.resource;
 
+import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.*;
 
@@ -41,8 +42,9 @@ public class ContactResource {
 	
 	/**
 	 * Constructor of this class.
+	 * @throws FileNotFoundException 
 	 */
-	public ContactResource(){
+	public ContactResource() throws FileNotFoundException{
 		
 		dao = DaoFactory.getInstance().getContactDao();
 		

@@ -2,6 +2,7 @@ package contact.service.jpa;
 
 import static org.junit.Assert.*;
 
+import java.io.FileNotFoundException;
 import java.net.URL;
 
 import org.junit.AfterClass;
@@ -40,13 +41,17 @@ public class JpaContactDaoTest {
 	@BeforeClass
 	public static void doFirst() throws Exception {
 		// this method is called before any tests and before the @Before method
-		URL url = JettyMain.startServer( );
+		String url = JettyMain.startServer(8080 );
 	}
 	
 	@AfterClass
+	public static void doLast() throws Exception {
+		// this method is called before any tests and before the @Before method
+		JettyMain.stopServer( );
+	}
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws FileNotFoundException {
 		contactDao = (JpaDaoFactory.getInstance()).getContactDao();
 	}
 
@@ -77,3 +82,4 @@ public class JpaContactDaoTest {
 	}
 
 }
+
