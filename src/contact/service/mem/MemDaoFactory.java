@@ -45,11 +45,15 @@ public class MemDaoFactory extends DaoFactory {
 		return daoInstance;
 	}
 	
-	public void loadFromFile(String locator){
+	/**
+	 * Load saved file.
+	 * @param fileLocator the location of the file
+	 */
+	public void loadFromFile(String fileLocator){
 		System.out.println("Load from file is called");
 		
 		try{
-			File inputFile = new File(locator);
+			File inputFile = new File(fileLocator);
 			Unmarshaller unmarshaller = JAXBContext.newInstance(ContactList.class).createUnmarshaller();
 			ContactList ctlist = (ContactList) unmarshaller.unmarshal(inputFile);
 			
@@ -63,8 +67,6 @@ public class MemDaoFactory extends DaoFactory {
 		}catch(JAXBException jax){
 			jax.printStackTrace();
 		}
-		
-		
 	}
 	
 	
@@ -74,11 +76,11 @@ public class MemDaoFactory extends DaoFactory {
 	@Override
 	public void shutdown(){
 		writeToFile();
-		//TODO here's your chance to show your skill!
-		// Use JAXB to write all your contacts to a file on disk.
-		// Then recreate them the next time a MemFactoryDao and ContactDao are created.
 	}
 	
+	/**
+	 * Create xml file of contact(s) based on user's input.
+	 */
 	public void writeToFile(){
 		System.out.println("Write to File is called");
 		try{
