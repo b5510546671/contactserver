@@ -37,18 +37,24 @@ public class JpaDaoFactory extends DaoFactory {
 		contactDao = new JpaContactDao( em );
 	}
 	
+	/**
+	 * @see contact.service.DaoFactory#getContactDao()
+	 */
 	@Override
 	public ContactDao getContactDao() {
 		return contactDao;
 	}
 	
+	/**
+	 * @see contact.service.DaoFactory#shutdown()
+	 */
 	@Override
 	public void shutdown() {
 		try {
 			if (em != null && em.isOpen()) em.close();
 			if (emf != null && emf.isOpen()) emf.close();
 		} catch (IllegalStateException ex) {
-			//TODO log it
+			logger.warning(ex.getMessage());
 		}
 	}
 

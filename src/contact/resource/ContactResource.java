@@ -15,21 +15,23 @@ import javax.xml.bind.JAXBElement;
 
 import contact.entity.Contact;
 import contact.service.ContactDao;
+import contact.service.DaoFactory;
 import contact.service.mem.MemContactDao;
+import contact.service.mem.MemDaoFactory;
 
 /**
  * A class that manages getting, creating, updating, and deleting contacts.
  * It replies using HTTP status codes responses.
  * 
  * @author Supavit 5510546671
- * @version 2014.09.22
+ * @version 2014.09.23
  */
 @Path("/contacts")
 @Singleton
 public class ContactResource {
 	
 	/** DAO that manages saving and getting contacts. */
-	private ContactDao dao = new MemContactDao();
+	private ContactDao dao;
 	
 	/**
 	 * URI information.
@@ -41,6 +43,9 @@ public class ContactResource {
 	 * Constructor of this class.
 	 */
 	public ContactResource(){
+		
+		dao = DaoFactory.getInstance().getContactDao();
+		
 		System.out.println("Initializing ContactResource");
 	}
 	

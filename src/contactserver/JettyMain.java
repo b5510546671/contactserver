@@ -7,6 +7,9 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 
 import contact.resource.ContactResource;
+import contact.service.ContactDao;
+import contact.service.DaoFactory;
+import contact.service.mem.MemDaoFactory;
 
 /**
  * <p>
@@ -116,6 +119,11 @@ public class JettyMain {
 		System.out.println("Server started.  Press ENTER to stop it.");
 		int ch = System.in.read();
 		System.out.println("Stopping server.");
+		
+		
+		DaoFactory dao = DaoFactory.getInstance();
+		dao.shutdown();
+		
 		server.stop();
 	}
 	

@@ -2,9 +2,14 @@ package contact.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -16,13 +21,19 @@ import javax.xml.bind.annotation.XmlRootElement;
  *@version 2014.09.22
  * 
  */
+@Entity
 @XmlRootElement(name="contact")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Contact implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	@XmlAttribute
 	private long id;
+	
+	//TODO how to specify a required element or attribute of an entity?
+	@XmlElement(required=true,nillable=false)
 	private String name;
 	private String title;
 	private String email;
