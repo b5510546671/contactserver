@@ -8,6 +8,12 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * Stores all the contacts on this contact server.
+ * @author Supavit 5510546671
+ * @version 2014.09.23
+ *
+ */
 @XmlRootElement(name="contacts")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ContactList {
