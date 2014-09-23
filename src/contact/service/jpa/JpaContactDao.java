@@ -80,14 +80,35 @@ public class JpaContactDao implements ContactDao{
 	 */
 	@Override
 	public List<Contact> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		Query query = em.createQuery("select c from Contact c");
+		List list = query.getResultList();
+		return list;
 	}
 
 	@Override
 	public boolean delete(long id) {
-		// TODO Auto-generated method stub
-		return false;
+		Contact contactObj = find(id);
+		if(contactObj == null){
+			throw new IllegalArgumentException("Can't delete a null contact");
+		}
+		EntityTransaction tx = em.getTransaction();
+		try{
+			tx.begin();
+			em.remove(contactObj);
+			tx.commit();
+			return true;
+		}catch(EntityExistsException ex){
+			Logger.getLogger(this.getClass().getName()).warning(ex.getMessage());
+			if(tx.isActive()){
+				try{
+					tx.rollback();
+				}catch(Exception e){
+					Logger.getLogger(this.getClass().getName()).warning(e.getMessage());
+				}
+			}
+		}
+		
+		return true;
 	}
 
 	/**
@@ -114,8 +135,18 @@ public class JpaContactDao implements ContactDao{
 	 */
 	@Override
 	public boolean update(Contact update) {
-		// TODO Auto-generated method stub
-		return false;
+		if (update == null) throw new IllegalArgumentException("Can't update a null contact");
+		EntityTransaction tx = em.getTransaction();
+		try {
+			Contact contact = find(update.getId());
+			em.merge(contact);
+			tx.commit();
+			return true;
+		} catch (EntityExistsException ex) {
+			Logger.getLogger(this.getClass().getName()).warning(ex.getMessage());
+			if (tx.isActive()) try { tx.rollback(); } catch(Exception e) {}
+			return false;
+		}
 	}
 
 }

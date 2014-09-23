@@ -31,7 +31,7 @@ public class MemDaoFactory extends DaoFactory {
 	/** instance of the entity DAO */
 	private ContactDao daoInstance;
 	
-	public MemDaoFactory() {
+	public MemDaoFactory() throws FileNotFoundException {
 		System.out.println("Create daoInstance.");
 		daoInstance = new MemContactDao();
 		loadFromFile("C://Users/knotsupavit/Desktop/build.xml");
@@ -49,7 +49,7 @@ public class MemDaoFactory extends DaoFactory {
 	 * Load saved file.
 	 * @param fileLocator the location of the file
 	 */
-	public void loadFromFile(String fileLocator){
+	public void loadFromFile(String fileLocator) throws FileNotFoundException{
 		System.out.println("Load from file is called");
 		
 		try{
