@@ -3,12 +3,14 @@ package contact.service.mem;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import contact.entity.Contact;
 import contact.entity.ContactList;
@@ -32,6 +34,7 @@ public class MemDaoFactory extends DaoFactory {
 	public MemDaoFactory() {
 		System.out.println("Create daoInstance.");
 		daoInstance = new MemContactDao();
+		loadFromFile("C://Users/knotsupavit/Desktop/build.xml");
 	}
 	
 	/**
@@ -41,6 +44,29 @@ public class MemDaoFactory extends DaoFactory {
 	public ContactDao getContactDao(){
 		return daoInstance;
 	}
+	
+	public void loadFromFile(String locator){
+		System.out.println("Load from file is called");
+		
+		try{
+			File inputFile = new File(locator);
+			Unmarshaller unmarshaller = JAXBContext.newInstance(ContactList.class).createUnmarshaller();
+			ContactList ctlist = (ContactList) unmarshaller.unmarshal(inputFile);
+			
+			if(ctlist != null){
+				List<Contact> contactList = ctlist.getContactList();
+				
+				for(Contact contact : contactList){
+					daoInstance.save(contact);
+				}
+			}
+		}catch(JAXBException jax){
+			jax.printStackTrace();
+		}
+		
+		
+	}
+	
 	
 	/**
 	 * @see contact.service.DaoFactory#shutdown()
@@ -59,13 +85,13 @@ public class MemDaoFactory extends DaoFactory {
 			for(Contact ctc : daoInstance.findAll()){
 				System.out.println(ctc.getName());
 			}
-			ContactList contactList = new ContactList();
-			contactList.setContactList(daoInstance.findAll());
+			ContactList contact = new ContactList();
+			contact.setContactList(daoInstance.findAll());
 			File file = new File("C://Users/knotsupavit/Desktop/build.xml");
 			FileOutputStream fileoutput = new FileOutputStream(file);
 			Marshaller jaxbMarshaller = JAXBContext.newInstance(ContactList.class).createMarshaller();
 			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			jaxbMarshaller.marshal(contactList, fileoutput);
+			jaxbMarshaller.marshal(contact, fileoutput);
 		}catch(JAXBException ex){
 			System.out.println("Error");
 			Logger.getLogger(MemDaoFactory.class.getName()).warning(ex.getMessage());

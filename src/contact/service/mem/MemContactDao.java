@@ -9,6 +9,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import contact.entity.Contact;
+import contact.entity.ContactList;
 import contact.service.ContactDao;
 
 /**
@@ -25,29 +26,11 @@ public class MemContactDao implements ContactDao {
 	private AtomicLong nextId;
 	
 	public MemContactDao() {
-		getSavedContacts();
 		contacts = new ArrayList<Contact>();
 		nextId = new AtomicLong(1000L);
 		//createTestContact(1);
 	}
 	
-	private void getSavedContacts() {
-//		try {
-//			JAXBContext jc = JAXBContext.newInstance();
-//			Unmarshaller un = jc.createUnmarshaller();
-//			File file = new File("C://Users/knotsupavit/Desktop/build.xml");
-//			Object obj = un.unmarshal(file);
-//			Contact contactObj = (Contact)obj;
-//			for(Contact ct : contactObj){
-//				contacts.add(ct);
-//			}
-//			
-//		} catch (JAXBException e) {
-//			e.printStackTrace();
-//		}
-		
-	}
-
 	/** add a single contact with given id for testing. */
 	private void createTestContact(long id) {
 		Contact test = new Contact("Test contact", "Joe Experimental", "none@testing.com");
