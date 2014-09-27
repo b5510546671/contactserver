@@ -92,169 +92,163 @@ public class WebServiceTest {
 		
 	}
 	
-//	/**
-//	 * Test POST method with successful condition (Created).
-//	 */
-//	@Test
-//	public void testPostSuccess(){
+	/**
+	 * Test POST method with successful condition (Created).
+	 */
+	@Test
+	public void testPostSuccess(){
+		//httpClient = new HttpClient();
+		try {
+			//httpClient.start();
+			StringContentProvider cProvider = new StringContentProvider(
+					"<contact id=\"5555\">" +
+					"<title>Knot</title>" +
+					"<name>Supavit</name>" +
+					"<email>tester@abc.com</email>" +
+					"<phoneNumber>012345678</phoneNumber>" +
+					"</contact>");
+			Request request = httpClient.newRequest(serviceUrl).content(cProvider, "application/xml").method(HttpMethod.POST);
+			ContentResponse contentResponse = request.send();
+			assertEquals("POST with Response CREATED", Status.CREATED.getStatusCode(), contentResponse.getStatus());
+			contentResponse = httpClient.GET(serviceUrl+5555);
+			assertTrue("GET posted contact using ID",!contentResponse.getContentAsString().isEmpty());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Test POST method with fail condition (Bad request).
+	 */
+	@Test
+	public void testPostFail(){
 //		httpClient = new HttpClient();
-//		try {
+		try {
 //			httpClient.start();
-//			StringContentProvider cProvider = new StringContentProvider(
-//					"<contact id=\"5555\">" +
-//					"<title>Knot</title>" +
-//					"<name>Supavit</name>" +
-//					"<email>tester@abc.com</email>" +
-//					"<phoneNumber>012345678</phoneNumber>" +
-//					"</contact>");
-//			Request request = httpClient.newRequest(serviceUrl).content(cProvider, "application/xml").method(HttpMethod.POST);
-//			ContentResponse contentResponse = request.send();
-//			assertEquals("POST with Response CREATED", Status.CREATED.getStatusCode(), contentResponse.getStatus());
-//			contentResponse = httpClient.GET(serviceUrl+5555);
-//			assertTrue("GET posted contact using ID",!contentResponse.getContentAsString().isEmpty());
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-//	
-//	/**
-//	 * Test POST method with fail condition (Bad request).
-//	 */
-//	@Test
-//	public void testPostFail(){
+			StringContentProvider cProvider = new StringContentProvider("");
+			Request request = httpClient.newRequest(serviceUrl).content(cProvider, "application/xml").method(HttpMethod.POST);
+			ContentResponse contentResponse = request.send();
+			assertEquals("POST with Response CONFLICT", Status.BAD_REQUEST.getStatusCode(), contentResponse.getStatus());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Test PUT method with success condition (OK).
+	 */
+	@Test
+	public void testPutSuccess(){
 //		httpClient = new HttpClient();
-//		try {
+		try{
 //			httpClient.start();
-//			StringContentProvider cProvider = new StringContentProvider(
-//					"<contact id=\"5555\">" +
-//					"<title>Knot</title>" +
-//					"<name>Supavit</name>" +
-//					"<email>tester@abc.com</email>" +
-//					"<phoneNumber>012345678</phoneNumber>" +
-//					"</contact>");
-//			Request request = httpClient.newRequest(serviceUrl).content(cProvider, "application/xml").method(HttpMethod.POST);
-//			ContentResponse contentResponse = request.send();
-//			assertEquals("POST with Response CONFLICT", Status.CONFLICT.getStatusCode(), contentResponse.getStatus());
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-//	
-//	/**
-//	 * Test PUT method with success condition (OK).
-//	 */
-//	@Test
-//	public void testPutSuccess(){
+			StringContentProvider cProvider = new StringContentProvider(
+					"<contact id=\"5000\">" +
+					"<title>Knot</title>" +
+					"<name>Supavit</name>" +
+					"<email>tester@abc.com</email>" +
+					"<phoneNumber>012345678</phoneNumber>" +
+					"</contact>");
+			Request request = httpClient.newRequest(serviceUrl).content(cProvider, "application/xml").method(HttpMethod.PUT);
+			ContentResponse contentResponse = request.send();
+			assertEquals("PUT with Response OK", Status.OK.getStatusCode(), contentResponse.getStatus());
+			contentResponse = httpClient.GET(serviceUrl);
+			String content = contentResponse.getContentAsString();
+			
+			Matcher matcher;
+			matcher = Pattern.compile(".*<name>Kongwudhi</name>.*").matcher(content);
+			assertTrue("Update name.", matcher.matches());
+			
+			matcher = Pattern.compile(".*<title>Knotsupavit</title>.*").matcher(content);
+			assertTrue("Update title.", matcher.matches());
+			
+			matcher = Pattern.compile(".*<email>knotsupavit@knotsupavit.com</email>.*").matcher(content);
+			assertTrue("Update email.", matcher.matches());
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Test PUT method with fail condition (Method Not Allowed).
+	 */
+	@Test
+	public void testPutFail(){
+		//httpClient = new HttpClient();
+		try{
+			//httpClient.start();
+			StringContentProvider cProvider = new StringContentProvider(
+					"<contact id=\"1234566543121\">" +
+					"</contact>");
+			Request request = httpClient.newRequest(serviceUrl).content(cProvider, "application/xml").method(HttpMethod.PUT);
+			ContentResponse contentResponse = request.send();
+			assertEquals("PUT with Response Method Not Allowed", Status.METHOD_NOT_ALLOWED.getStatusCode(), contentResponse.getStatus());
+						
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Test GET method with OK condition (OK).
+	 */
+	@Test
+	public void testGetSuccess(){
+		long id = 1;
 //		httpClient = new HttpClient();
-//		try{
+		try{
 //			httpClient.start();
-//			StringContentProvider cProvider = new StringContentProvider(
-//					"<contact id=\"5000\">" +
-//					"<title>Knot</title>" +
-//					"<name>Supavit</name>" +
-//					"<email>tester@abc.com</email>" +
-//					"<phoneNumber>012345678</phoneNumber>" +
-//					"</contact>");
-//			Request request = httpClient.newRequest(serviceUrl).content(cProvider, "application/xml").method(HttpMethod.PUT);
-//			ContentResponse contentResponse = request.send();
-//			assertEquals("PUT with Response OK", Status.OK.getStatusCode(), contentResponse.getStatus());
-//			contentResponse = httpClient.GET(serviceUrl);
-//			String content = contentResponse.getContentAsString();
-//			
-//			Matcher matcher;
-//			matcher = Pattern.compile(".*<name>Kongwudhi</name>.*").matcher(content);
-//			assertTrue("Update name.", matcher.matches());
-//			
-//			matcher = Pattern.compile(".*<title>Knotsupavit</title>.*").matcher(content);
-//			assertTrue("Update title.", matcher.matches());
-//			
-//			matcher = Pattern.compile(".*<email>knotsupavit@knotsupavit.com</email>.*").matcher(content);
-//			assertTrue("Update email.", matcher.matches());
-//			
-//		}catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-//	
-//	/**
-//	 * Test PUT method with fail condition (BAD Request).
-//	 */
-//	@Test
-//	public void testPutFail(){
+			ContentResponse contentResponse = httpClient.GET(serviceUrl+id);
+			assertEquals("GET with Response OK", Status.OK.getStatusCode(), contentResponse.getStatus());
+			assertTrue("Content is not null", !contentResponse.getContentAsString().isEmpty());
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * Test GET method with fail condition (NO CONTENT).
+	 */
+	@Test
+	public void testGetFail(){
 //		httpClient = new HttpClient();
-//		try{
+		try{
 //			httpClient.start();
-//			StringContentProvider cProvider = new StringContentProvider(
-//					"<contact id=\"1234566543121\">" +
-//					"</contact>");
-//			Request request = httpClient.newRequest(serviceUrl).content(cProvider, "application/xml").method(HttpMethod.PUT);
-//			ContentResponse contentResponse = request.send();
-//			assertEquals("PUT with Response BAD REQUEST", Status.BAD_REQUEST.getStatusCode(), contentResponse.getStatus());
-//						
-//		}catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-//	
-//	/**
-//	 * Test GET method with OK condition (OK).
-//	 */
-//	@Test
-//	public void testGetSuccess(){
-//		long id = 1;
+			ContentResponse contentResponse = httpClient.GET(serviceUrl);
+			assertEquals("GET with Response NO CONTENT", Status.NO_CONTENT.getStatusCode(), contentResponse.getStatus());
+			assertTrue("Content is null", contentResponse.getContentAsString().isEmpty());
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	/**
+	 * Test DELETE method with successful condition (OK).
+	 */
+	@Test
+	public void testDeleteSuccess(){
 //		httpClient = new HttpClient();
-//		try{
+		try {
 //			httpClient.start();
-//			ContentResponse contentResponse = httpClient.GET(serviceUrl+id);
-//			assertEquals("GET with Response OK", Status.OK.getStatusCode(), contentResponse.getStatus());
-//			assertTrue("Content is not null", !contentResponse.getContentAsString().isEmpty());
-//		}catch(Exception e){
-//			e.printStackTrace();
-//		}
-//	}
-//	/**
-//	 * Test GET method with fail condition (NO CONTENT).
-//	 */
-//	@Test
-//	public void testGetFail(){
-//		httpClient = new HttpClient();
-//		try{
-//			httpClient.start();
-//			ContentResponse contentResponse = httpClient.GET(serviceUrl);
-//			assertEquals("GET with Response NO CONTENT", Status.NO_CONTENT.getStatusCode(), contentResponse.getStatus());
-//			assertTrue("Content is null", contentResponse.getContentAsString().isEmpty());
-//		}catch(Exception e){
-//			e.printStackTrace();
-//		}
-//	}
-//	/**
-//	 * Test DELETE method with successful condition (OK).
-//	 */
-//	@Test
-//	public void testDeleteSuccess(){
-//		httpClient = new HttpClient();
-//		try {
-//			httpClient.start();
-//			StringContentProvider cProvider = new StringContentProvider(
-//					"<contact id=\"5555\">" +
-//					"<title>Knot</title>" +
-//					"<name>Supavit</name>" +
-//					"<email>tester@abc.com</email>" +
-//					"<phoneNumber>012345678</phoneNumber>" +
-//					"</contact>");
-//			
-//			ContentResponse contentResponse = httpClient.newRequest(serviceUrl).content(cProvider, "application/xml").method(HttpMethod.POST).send();
-//			Request request = httpClient.newRequest(serviceUrl + 5555).method(HttpMethod.DELETE);
-//			contentResponse = request.send();
-//			assertEquals("DELETE with Response OK", Status.OK.getStatusCode(), contentResponse.getStatus());
-//			contentResponse = httpClient.GET(serviceUrl+5555);
-//			
-//			
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
+			StringContentProvider cProvider = new StringContentProvider(
+					"<contact id=\"5555\">" +
+					"<title>Knot</title>" +
+					"<name>Supavit</name>" +
+					"<email>tester@abc.com</email>" +
+					"<phoneNumber>012345678</phoneNumber>" +
+					"</contact>");
+			
+			ContentResponse contentResponse = httpClient.newRequest(serviceUrl).content(cProvider, "application/xml").method(HttpMethod.POST).send();
+			Request request = httpClient.newRequest(serviceUrl + 5555).method(HttpMethod.DELETE);
+			contentResponse = request.send();
+			assertEquals("DELETE with Response OK", Status.OK.getStatusCode(), contentResponse.getStatus());
+			contentResponse = httpClient.GET(serviceUrl+5555);
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * Test DELETE method with fail condition (BAD REQUEST).

@@ -101,6 +101,9 @@ public class ContactDaoTest {
 		assertFalse( dao.delete(id) );
 	}
 	
+	/**
+	 * Method testUpdate should fail.
+	 */
 	@Test
 	public void testUpdate() {
 		saveAllContacts();

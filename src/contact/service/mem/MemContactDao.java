@@ -108,9 +108,6 @@ public class MemContactDao implements ContactDao {
 	public boolean update(Contact update) {
 		Contact contact = find(update.getId());
 		if (contact == null) return false;
-//		if (update.getEmail() == null || update.getName() == null || /*contact.getPhotoUrl() == null ||*/ update.getTitle() == null){
-//			return false;
-//		}
 		contact.applyUpdate(update);
 		save(contact);
 		return true;
@@ -129,6 +126,9 @@ public class MemContactDao implements ContactDao {
 		return id; // this should never happen
 	}
 
+	/**
+	 * @see contact.service.ContactDao#removeAll()
+	 */
 	@Override
 	public void removeAll() {
 		for(Contact c : findAll()){

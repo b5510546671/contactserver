@@ -87,6 +87,9 @@ public class JpaContactDao implements ContactDao{
 		return list;
 	}
 
+	/**
+	 * @see contact.service.ContactDao#delete(long)
+	 */
 	@Override
 	public boolean delete(long id) {
 		Contact contactObj = find(id);
@@ -151,6 +154,9 @@ public class JpaContactDao implements ContactDao{
 		}
 	}
 
+	/**
+	 * @see contact.service.ContactDao#removeAll()
+	 */
 	@Override
 	public void removeAll() {
 			for(Contact c : findAll()){

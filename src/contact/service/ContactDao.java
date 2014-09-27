@@ -59,7 +59,7 @@ public interface ContactDao {
 	public abstract boolean update(Contact update);
 	
 	/**
-	 * Remove all elements in the memeory.
+	 * Remove all elements in the memory.
 	 */
 	public abstract void removeAll();
 
