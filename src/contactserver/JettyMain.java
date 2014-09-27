@@ -60,7 +60,7 @@ import contact.service.mem.MemDaoFactory;
  * your project!  If you do, compare the JARs, or switch to a Maven
  * project so Maven will manage your dependencies. 
  * 
- * @author jim
+ * @author jim, Supavit 5510546671
  *
  */
 public class JettyMain {

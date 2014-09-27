@@ -1,5 +1,6 @@
 package contact.service.jpa;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -11,6 +12,7 @@ import javax.persistence.Query;
 import jersey.repackaged.com.google.common.collect.Lists;
 import contact.entity.Contact;
 import contact.service.ContactDao;
+import contact.service.mem.MemDaoFactory;
 /**
  * Data access object for saving and retrieving contacts,
  * using JPA.
@@ -147,6 +149,14 @@ public class JpaContactDao implements ContactDao{
 			if (tx.isActive()) try { tx.rollback(); } catch(Exception e) {}
 			return false;
 		}
+	}
+
+	@Override
+	public void removeAll() {
+			for(Contact c : findAll()){
+				delete(c.getId());
+			}
+
 	}
 
 }

@@ -173,7 +173,7 @@ public class ContactResource {
 		System.out.println("delete contact was called");
 		if(dao.delete(id)) return Response.ok("Deleted").build();
 		else{
-			return Response.status(Response.Status.NOT_FOUND).build();
+			return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
 		}
 	}
 	

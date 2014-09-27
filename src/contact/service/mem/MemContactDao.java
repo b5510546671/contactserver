@@ -1,6 +1,7 @@
 package contact.service.mem;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -126,5 +127,12 @@ public class MemContactDao implements ContactDao {
 			id = nextId.getAndAdd(1L);
 		}
 		return id; // this should never happen
+	}
+
+	@Override
+	public void removeAll() {
+		for(Contact c : findAll()){
+			delete(c.getId());
+		}
 	}
 }
