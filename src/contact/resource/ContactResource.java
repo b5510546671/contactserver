@@ -62,7 +62,7 @@ public class ContactResource {
 	 * Get all contacts from database.
 	 * @return HTTP status code whether OK or not found
 	 */
-	public Response getContacts(@Context Request request){
+	public Response getContacts(@HeaderParam("If-Match") String match, @HeaderParam("If-None-Match") String noneMatch, @Context Request request){
 		System.out.println("Get Contacts was called");
 		ContactList contactlist = new ContactList();
 		contactlist.setContactList(dao.findAll());
@@ -73,17 +73,29 @@ public class ContactResource {
 		//set max age to infinity
 		cachecontrol.setMaxAge(-1);
 		
-		ResponseBuilder builder = request.evaluatePreconditions(etag); 
-		
-		if(builder != null){
-			builder.cacheControl(cachecontrol);
-			return builder.build();
+		if(match != null){
+			
+		}
+		if(noneMatch != null){
+			if(!noneMatch.equals(contactlist.createMD5())){
+				ResponseBuilder builder = request.evaluatePreconditions(etag); 
+				
+				if(builder != null){
+					builder.cacheControl(cachecontrol);
+					return builder.build();
+				}
+				
+				builder = Response.ok(contactlist, "application/xml");
+				builder.cacheControl(cachecontrol);
+				builder.tag(etag);
+				return builder.build();
+			}
+			else{
+				return Response.status(Response.Status.NOT_MODIFIED).build(); 
+			}
 		}
 		
-		builder = Response.ok(contactlist, "application/xml");
-		builder.cacheControl(cachecontrol);
-		builder.tag(etag);
-		return builder.build();
+		return null;
 		
 	}
 	
@@ -95,7 +107,7 @@ public class ContactResource {
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_XML)
-	public Response getContact(@PathParam("id") long id, @Context Request request){
+	public Response getContact(@HeaderParam("If-Match") String match, @HeaderParam("If-None-Match") String noneMatch, @PathParam("id") long id, @Context Request request){
 		System.out.println("Get contact using id was called");
 		
 		Contact contact = dao.find(id);
@@ -105,26 +117,33 @@ public class ContactResource {
 		//set max age to infinity
 		cachecontrol.setMaxAge(-1);
 		
-		ResponseBuilder builder = request.evaluatePreconditions(/*contact.getLastModified(),*/ etag); 
-		
-		if(builder != null){
-			builder.cacheControl(cachecontrol);
-			return builder.build();
+		if(match != null){
+			
+		}
+		if(noneMatch != null){
+			if( !noneMatch.equals(contact.createMD5())){
+				ResponseBuilder builder = request.evaluatePreconditions(etag); 
+				
+				if(builder != null){
+					builder.cacheControl(cachecontrol);
+					return builder.build();
+				}
+				
+				builder = Response.ok(contact, "application/xml");
+				builder.cacheControl(cachecontrol);
+				builder.tag(etag);
+				return builder.build();
+			}
+			else{
+				return Response.status(Response.Status.NOT_MODIFIED).build();
+			}
 		}
 		
-		builder = Response.ok(contact, "application/xml");
-		builder.cacheControl(cachecontrol);
-		builder.tag(etag);
-		return builder.build();
-		
-//		if(contact == null){
-//			return Response.status(Response.Status.NOT_FOUND).build();
-//		}
-//		else{
-//			return Response.ok(contact).build();
-//		}
+		return null;
 	}
 	
+	
+
 	/**
 	 * Get contacts from database using query string.
 	 * @param title the query string to search
@@ -132,9 +151,9 @@ public class ContactResource {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
-	public Response getContact(@QueryParam("title") String title, @Context Request request){
+	public Response getContact(@HeaderParam("If-Match") String match, @HeaderParam("If-None-Match") String noneMatch, @QueryParam("title") String title, @Context Request request){
 		System.out.println("Get contact using query param was called");
-		if ( title == null ) return getContacts(request);
+		if ( title == null ) return getContacts(match, noneMatch, request);
 		
 		ContactList contactlist = new ContactList();
 		contactlist.setContactList(dao.search(title));
@@ -147,25 +166,29 @@ public class ContactResource {
 		//set max age to infinity
 		cachecontrol.setMaxAge(-1);
 		
-		ResponseBuilder builder = request.evaluatePreconditions(etag); 
-		
-		if(builder != null){
-			builder.cacheControl(cachecontrol);
-			return builder.build();
+		if(match != null){
+			
+		}
+		if(noneMatch != null){
+			if(!noneMatch.equals(contactlist.createMD5())){
+				ResponseBuilder builder = request.evaluatePreconditions(etag); 
+				
+				if(builder != null){
+					builder.cacheControl(cachecontrol);
+					return builder.build();
+				}
+				
+				builder = Response.ok(contactlist, "application/xml");
+				builder.cacheControl(cachecontrol);
+				builder.tag(etag);
+				return builder.build();
+			}
+			else{
+				return Response.status(Response.Status.NOT_MODIFIED).build();
+			}
 		}
 		
-		builder = Response.ok(contactlist, "application/xml");
-		builder.cacheControl(cachecontrol);
-		builder.tag(etag);
-		return builder.build();
-		
-		
-//		if(entity != null){
-//			return Response.ok(entity).build();
-//		}
-//		else{
-//			return Response.status(Response.Status.NOT_FOUND).build();
-//		}
+		return null;
 	}
 	
 	/**
@@ -205,7 +228,7 @@ public class ContactResource {
 	@PUT
 	@Path("{id}")
 	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-	public Response updateContact(@PathParam("id") long id, JAXBElement<Contact> element, @Context Request request){
+	public Response updateContact(@HeaderParam("If-None-Match") String noneMatch, @HeaderParam("If-Match") String match, @PathParam("id") long id, JAXBElement<Contact> element, @Context Request request){
 		System.out.println("update contact was called");
 		
 		Contact contact = element.getValue();
@@ -252,5 +275,8 @@ public class ContactResource {
 			return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
 		}
 	}
+	
+	
+	
 	
 }
