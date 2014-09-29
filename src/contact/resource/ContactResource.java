@@ -32,7 +32,7 @@ import contact.service.mem.MemDaoFactory;
  * It replies using HTTP status codes responses.
  * 
  * @author Supavit 5510546671
- * @version 2014.09.23
+ * @version 2014.09.29
  */
 @Path("/contacts")
 @Singleton
@@ -73,28 +73,70 @@ public class ContactResource {
 		//set max age to infinity
 		cachecontrol.setMaxAge(-1);
 		
+		if(match == null && noneMatch == null){
+			return replyInformationWithGet(etag, request, cachecontrol, contactlist);
+//			ResponseBuilder builder = request.evaluatePreconditions(etag); 
+//			
+//			if(builder != null){
+//				builder.cacheControl(cachecontrol);
+//				return builder.build();
+//			}
+//			
+//			builder = Response.ok(contactlist, "application/xml");
+//			builder.cacheControl(cachecontrol);
+//			builder.tag(etag);
+//			return builder.build();
+		}
+		if(match != null && noneMatch != null){
+			return Response.status(Response.Status.BAD_REQUEST).build(); 
+		}
+		
 		if(match != null){
+			if(match.equals(contactlist.createMD5())){
+				return replyInformationWithGet(etag, request, cachecontrol, contactlist);
+//				ResponseBuilder builder = request.evaluatePreconditions(etag); 
+//				
+//				if(builder != null){
+//					builder.cacheControl(cachecontrol);
+//					return builder.build();
+//				}
+//				
+//				builder = Response.ok(contactlist, "application/xml");
+//				builder.cacheControl(cachecontrol);
+//				builder.tag(etag);
+//				return builder.build();
+			}
+			else{
+				return Response.status(Response.Status.PRECONDITION_FAILED).build();
+			}
+		}
+		else{
 			
 		}
 		if(noneMatch != null){
 			if(!noneMatch.equals(contactlist.createMD5())){
-				ResponseBuilder builder = request.evaluatePreconditions(etag); 
-				
-				if(builder != null){
-					builder.cacheControl(cachecontrol);
-					return builder.build();
-				}
-				
-				builder = Response.ok(contactlist, "application/xml");
-				builder.cacheControl(cachecontrol);
-				builder.tag(etag);
-				return builder.build();
+				return replyInformationWithGet(etag, request, cachecontrol, contactlist);
+//				ResponseBuilder builder = request.evaluatePreconditions(etag); 
+//				
+//				if(builder != null){
+//					builder.cacheControl(cachecontrol);
+//					return builder.build();
+//				}
+//				
+//				builder = Response.ok(contactlist, "application/xml");
+//				builder.cacheControl(cachecontrol);
+//				builder.tag(etag);
+//				return builder.build();
 			}
 			else{
 				return Response.status(Response.Status.NOT_MODIFIED).build(); 
 			}
 		}
+		else{
+			
+		}
 		
+		System.out.println("nnnccccs");
 		return null;
 		
 	}
@@ -117,22 +159,24 @@ public class ContactResource {
 		//set max age to infinity
 		cachecontrol.setMaxAge(-1);
 		
+		if(match == null && noneMatch == null){
+			return replyInformationWithGet(etag, request, cachecontrol, contact);
+		}
+		
+		if(match != null && noneMatch != null){
+			return Response.status(Response.Status.BAD_REQUEST).build(); 
+		}
 		if(match != null){
-			
+			if(match.equals(contact.createMD5())){
+				return replyInformationWithGet(etag, request, cachecontrol, contact);
+			}
+			else{
+				return Response.status(Response.Status.PRECONDITION_FAILED).build();
+			}
 		}
 		if(noneMatch != null){
 			if( !noneMatch.equals(contact.createMD5())){
-				ResponseBuilder builder = request.evaluatePreconditions(etag); 
-				
-				if(builder != null){
-					builder.cacheControl(cachecontrol);
-					return builder.build();
-				}
-				
-				builder = Response.ok(contact, "application/xml");
-				builder.cacheControl(cachecontrol);
-				builder.tag(etag);
-				return builder.build();
+				return replyInformationWithGet(etag, request, cachecontrol, contact);
 			}
 			else{
 				return Response.status(Response.Status.NOT_MODIFIED).build();
@@ -166,26 +210,34 @@ public class ContactResource {
 		//set max age to infinity
 		cachecontrol.setMaxAge(-1);
 		
+		if(match == null && noneMatch == null){
+			return replyInformationWithGet(etag, request, cachecontrol, contactlist);
+		}
+		if(match != null && noneMatch != null){
+			return Response.status(Response.Status.BAD_REQUEST).build(); 
+		}
+		
 		if(match != null){
+			if(match.equals(contactlist.createMD5())){
+				return replyInformationWithGet(etag, request, cachecontrol, contactlist);
+			}
+			else{
+				return Response.status(Response.Status.PRECONDITION_FAILED).build();
+			}
+		}
+		else{
 			
 		}
 		if(noneMatch != null){
 			if(!noneMatch.equals(contactlist.createMD5())){
-				ResponseBuilder builder = request.evaluatePreconditions(etag); 
-				
-				if(builder != null){
-					builder.cacheControl(cachecontrol);
-					return builder.build();
-				}
-				
-				builder = Response.ok(contactlist, "application/xml");
-				builder.cacheControl(cachecontrol);
-				builder.tag(etag);
-				return builder.build();
+				return replyInformationWithGet(etag, request, cachecontrol, contactlist);
 			}
 			else{
-				return Response.status(Response.Status.NOT_MODIFIED).build();
+				return Response.status(Response.Status.NOT_MODIFIED).build(); 
 			}
+		}
+		else{
+			
 		}
 		
 		return null;
@@ -199,15 +251,29 @@ public class ContactResource {
 	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
-	public Response createContact(JAXBElement<Contact> element, @Context UriInfo uriInfo){
+	public Response createContact(JAXBElement<Contact> element, @Context UriInfo uriInfo, @Context Request request){
 		System.out.println("create contact was called");
 		Contact contact = element.getValue();
 		
 		if(dao.find(contact.getId()) == null){
-			//contact.setLastModified(Calendar.getInstance().getTime());
+			
+			EntityTag etag = new EntityTag(contact.createMD5());
+			CacheControl cachecontrol = new CacheControl();
+			//set max age to infinity
+			cachecontrol.setMaxAge(-1);
+			
+			ResponseBuilder builder = request.evaluatePreconditions(etag);
+			if(builder != null){
+				return builder.build();
+			}
+			
+			
 			if( dao.save(contact) ){
 				URI uri = uriInfo.getAbsolutePath();
-				return Response.created(uri).build();
+				
+				builder = Response.created(uri);
+				
+				return builder.build();
 			}
 			else{
 				return Response.status(Response.Status.BAD_REQUEST).build();
@@ -216,7 +282,7 @@ public class ContactResource {
 		else{
 			return Response.status(Response.Status.CONFLICT).build();
 		}
-	
+
 	}
 	
 	/**
@@ -236,28 +302,37 @@ public class ContactResource {
 		if(contact.getId() == id){
 			
 			EntityTag etag = new EntityTag(contact.createMD5());
-			//Date timestamp = contact.getLastModified();
-			System.out.println("Contact is "+ contact.getId());
-			//System.out.println("Timestamp is "+contact.getLastModified()+"");
-			ResponseBuilder builder = request.evaluatePreconditions(etag);
 			
-			if(builder != null){
-				return builder.build();
+						
+			if(match != null && noneMatch != null){
+				return Response.status(Response.Status.BAD_REQUEST).build(); 
 			}
-					
-			if(dao.update(contact)){
-				builder = Response.noContent();
-				return builder.build();
+			if(match == null && noneMatch == null){
+				return replyInformationWithUpdate(etag, request, contact);
 			}
-			else{
-				return Response.status(Response.Status.NOT_FOUND).build();
+			
+			if(match != null){
+				if(match.equals(contact.createMD5())){
+					return replyInformationWithUpdate(etag, request, contact);
+				}
+				else{
+					return Response.status(Response.Status.PRECONDITION_FAILED).build();
+				}
+			}
+			
+			if(noneMatch != null){
+				if(!noneMatch.equals(contact.createMD5())){
+					return replyInformationWithUpdate(etag, request, contact);
+				}
+				else{
+					return Response.status(Response.Status.PRECONDITION_FAILED).build(); 
+				}
 			}
 		}
 		else{
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
-		
-		
+		return null;
 	}
 	
 	/**
@@ -268,15 +343,95 @@ public class ContactResource {
 	 */
 	@DELETE
 	@Path("{id}")
-	public Response deleteContact(@PathParam("id") long id){
+	public Response deleteContact(@HeaderParam("If-Match") String match, @HeaderParam("If-None-Match") String noneMatch, @PathParam("id") long id, @Context Request request){
 		System.out.println("delete contact was called");
-		if(dao.delete(id)) return Response.ok("Deleted").build();
+		
+		Contact contact = dao.find(id);
+		EntityTag etag = new EntityTag(contact.createMD5());
+		
+		if(match != null && noneMatch != null){
+			return Response.status(Response.Status.BAD_REQUEST).build(); 
+		}
+		if(match == null && noneMatch == null){
+			return replyInformationWithDelete(etag, request, contact);
+		}
+		
+		if(match != null){
+			if(match.equals(contact.createMD5())){
+				return replyInformationWithDelete(etag, request, contact);
+			}
+			else{
+				return Response.status(Response.Status.PRECONDITION_FAILED).build();
+			}
+		}
+		
+		if(noneMatch != null){
+			if(!noneMatch.equals(contact.createMD5())){
+				return replyInformationWithDelete(etag, request, contact);
+			}
+			else{
+				return Response.status(Response.Status.PRECONDITION_FAILED).build(); 
+			}
+		}
+		
+		
+		if(dao.delete(id)){
+			return Response.ok("Deleted").build();
+		}
 		else{
 			return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
 		}
 	}
 	
+	public Response replyInformationWithGet(EntityTag etag, Request request, CacheControl cachecontrol, ContactList contactlist){
+		ResponseBuilder builder = request.evaluatePreconditions(etag); 
+		
+		if(builder != null){
+			builder.cacheControl(cachecontrol);
+			return builder.build();
+		}
+		
+		builder = Response.ok(contactlist, "application/xml");
+		builder.cacheControl(cachecontrol);
+		builder.tag(etag);
+		return builder.build();
+	}
 	
+	public Response replyInformationWithGet(EntityTag etag, Request request, CacheControl cachecontrol, Contact contact){
+		ResponseBuilder builder = request.evaluatePreconditions(etag); 
+		
+		if(builder != null){
+			builder.cacheControl(cachecontrol);
+			return builder.build();
+		}
+		
+		builder = Response.ok(contact, "application/xml");
+		builder.cacheControl(cachecontrol);
+		builder.tag(etag);
+		return builder.build();
+	}
 	
+	public Response replyInformationWithUpdate(EntityTag etag, Request request, Contact contact){
+		ResponseBuilder builder = request.evaluatePreconditions(etag);
+		if(builder != null){
+			return builder.build();
+		}
+				
+		if(dao.update(contact)){
+			builder = Response.ok();
+			return builder.build();
+		}
+		else{
+			return Response.status(Response.Status.NOT_FOUND).build();
+		}
+	}
+	public Response replyInformationWithDelete(EntityTag etag, Request request, Contact contact){
+		if(dao.delete(contact.getId())){
+			return Response.ok("Deleted").build();
+		}
+		else{
+			return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
+		}
+	}
 	
 }
