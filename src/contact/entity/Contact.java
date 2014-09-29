@@ -1,6 +1,9 @@
 package contact.entity;
 
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -41,16 +44,19 @@ public class Contact implements Serializable {
 	/** URL of photo */
 	private String photoUrl;
 	
+	private String phoneNumber;
+	
 	@XmlElement(name="Last-Modified")
 	private Date lastModified;
 	
 	public Contact() { }
 	
-	public Contact(String title, String name, String email ) {
+	public Contact(String title, String name, String email, String phoneNumber ) {
 		this.title = title;
 		this.name = name;
 		this.email = email;
 		this.photoUrl = "";
+		this.setPhoneNumber(phoneNumber);
 	}
 
 	public Contact(long id) {
@@ -64,7 +70,14 @@ public class Contact implements Serializable {
 	public void setPhotoUrl(String photo) {
 		this.photoUrl = photo;
 	}
+	
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
 
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
   
 	public String getName() {
 		return name;
@@ -150,4 +163,25 @@ public class Contact implements Serializable {
 	public void setLastModified(Date lastModified) {
 		this.lastModified = lastModified;
 	}
+	
+	/**
+	 * Create the MD5 of the contact.
+	 * @return String representation of MD5
+	 */
+	public String createMD5(){
+		try {
+	        MessageDigest m = MessageDigest.getInstance("MD5");
+	        String s = this.id + "" + this.name + this.title + this.email + this.phoneNumber + this.photoUrl;
+	        m.update(s.getBytes(), 0, s.length());
+	        BigInteger i = new BigInteger(1,m.digest());
+	        System.out.println(  String.format("%1$032x", i) );
+	        return String.format("%1$032x", i);         
+	    } catch (NoSuchAlgorithmException e) {
+	    	System.out.println("Error from getMd5 method");
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
+
+	
 }

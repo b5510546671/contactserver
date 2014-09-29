@@ -1,5 +1,8 @@
 package contact.entity;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,5 +34,26 @@ public class ContactList {
 
 	public void setContactList(List<Contact> contactList) {
 		this.contact = contactList;
+	}
+	
+	/**
+	 * Create the MD5 of the contact.
+	 * @return String representation of MD5
+	 */
+	public String createMD5(){
+		try {
+	        MessageDigest m = MessageDigest.getInstance("MD5");
+	        String s = "";
+	        for(Contact ct : contact){
+	        	s += ct.createMD5();
+	        }
+	        m.update(s.getBytes(), 0, s.length());
+	        BigInteger i = new BigInteger(1,m.digest());
+	        return String.format("%1$032x", i);         
+	    } catch (NoSuchAlgorithmException e) {
+	    	System.out.println("Error from getMd5 method");
+	        e.printStackTrace();
+	    }
+	    return null;
 	}
 }

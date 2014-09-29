@@ -43,13 +43,13 @@ public class JpaContactDao implements ContactDao{
 	private void createTestContact( ) {
 		long id = 101; // usually we should let JPA set the id
 		if (find(id) == null) {
-			Contact test = new Contact("Test contact", "Joe Experimental", "none@testing.com");
+			Contact test = new Contact("Test contact", "Joe Experimental", "none@testing.com", "022245123");
 			test.setId(id);
 			save(test);
 		}
 		id++;
 		if (find(id) == null) {
-			Contact test2 = new Contact("Another Test contact", "Testosterone", "testee@foo.com");
+			Contact test2 = new Contact("Another Test contact", "Testosterone", "testee@foo.com", "0212345678");
 			test2.setId(id);
 			save(test2);
 		}

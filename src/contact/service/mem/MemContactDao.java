@@ -34,7 +34,7 @@ public class MemContactDao implements ContactDao {
 	
 	/** add a single contact with given id for testing. */
 	private void createTestContact(long id) {
-		Contact test = new Contact("Test contact", "Joe Experimental", "none@testing.com");
+		Contact test = new Contact("Test contact", "Joe Experimental", "none@testing.com", "022245123");
 		test.setId(id);
 		contacts.add(test);
 	}

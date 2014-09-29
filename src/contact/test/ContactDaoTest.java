@@ -21,9 +21,9 @@ public class ContactDaoTest {
 	public void setUp() {
 		// create a new DAO for each test and create some sample contacts
 		dao = new MemContactDao();
-		contact1 = new Contact("contact1", "Joe Contact", "joe@microsoft.com");
-		contact2 = new Contact("contact2", "Sally Contract", "sally@foo.com");
-		contact3 = new Contact("contact3", "Foo Bar", "foo@barclub.com");
+		contact1 = new Contact("contact1", "Joe Contact", "joe@microsoft.com", "0221234678");
+		contact2 = new Contact("contact2", "Sally Contract", "sally@foo.com", "0841234981");
+		contact3 = new Contact("contact3", "Foo Bar", "foo@barclub.com", "0897164531");
 	}
 	
 	private void saveAllContacts() {

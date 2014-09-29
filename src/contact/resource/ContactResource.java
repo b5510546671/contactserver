@@ -21,6 +21,7 @@ import javax.xml.bind.JAXBElement;
 import org.osgi.framework.hooks.service.FindHook;
 
 import contact.entity.Contact;
+import contact.entity.ContactList;
 import contact.service.ContactDao;
 import contact.service.DaoFactory;
 import contact.service.mem.MemContactDao;
@@ -61,16 +62,29 @@ public class ContactResource {
 	 * Get all contacts from database.
 	 * @return HTTP status code whether OK or not found
 	 */
-	public Response getContacts(){
+	public Response getContacts(@Context Request request){
 		System.out.println("Get Contacts was called");
-		List<Contact> contactList = dao.findAll();
-		GenericEntity<List<Contact>> entity = new GenericEntity<List<Contact>>(contactList){};
-		if(entity != null){
-			return Response.ok(entity).build();
+		ContactList contactlist = new ContactList();
+		contactlist.setContactList(dao.findAll());
+		//GenericEntity<List<Contact>> entity = new GenericEntity<List<Contact>>(contactList){};
+		
+		EntityTag etag = new EntityTag(contactlist.createMD5());
+		CacheControl cachecontrol = new CacheControl();
+		//set max age to infinity
+		cachecontrol.setMaxAge(-1);
+		
+		ResponseBuilder builder = request.evaluatePreconditions(etag); 
+		
+		if(builder != null){
+			builder.cacheControl(cachecontrol);
+			return builder.build();
 		}
-		else{
-			return Response.status(Response.Status.NOT_FOUND).build();
-		}
+		
+		builder = Response.ok(contactlist, "application/xml");
+		builder.cacheControl(cachecontrol);
+		builder.tag(etag);
+		return builder.build();
+		
 	}
 	
 	/**
@@ -86,10 +100,10 @@ public class ContactResource {
 		
 		Contact contact = dao.find(id);
 		
-		EntityTag etag = new EntityTag(Integer.toString(contact.hashCode()));
+		EntityTag etag = new EntityTag(contact.createMD5());
 		CacheControl cachecontrol = new CacheControl();
-		//set max age to 3 minutes
-		cachecontrol.setMaxAge(180);
+		//set max age to infinity
+		cachecontrol.setMaxAge(-1);
 		
 		ResponseBuilder builder = request.evaluatePreconditions(/*contact.getLastModified(),*/ etag); 
 		
@@ -120,15 +134,18 @@ public class ContactResource {
 	@Produces(MediaType.APPLICATION_XML)
 	public Response getContact(@QueryParam("title") String title, @Context Request request){
 		System.out.println("Get contact using query param was called");
-		if ( title == null ) return getContacts();
-				
-		List<Contact> contactlist = dao.search(title);
-		GenericEntity<List<Contact>> entity = new GenericEntity<List<Contact>>(contactlist){};
+		if ( title == null ) return getContacts(request);
 		
-		EntityTag etag = new EntityTag(Integer.toString(entity.hashCode()));
+		ContactList contactlist = new ContactList();
+		contactlist.setContactList(dao.search(title));
+		
+		
+		//GenericEntity<List<Contact>> entity = new GenericEntity<List<Contact>>(contactlist){};
+		
+		EntityTag etag = new EntityTag(contactlist.createMD5());
 		CacheControl cachecontrol = new CacheControl();
-		//set max age to 3 minutes
-		cachecontrol.setMaxAge(180);
+		//set max age to infinity
+		cachecontrol.setMaxAge(-1);
 		
 		ResponseBuilder builder = request.evaluatePreconditions(etag); 
 		
@@ -137,7 +154,7 @@ public class ContactResource {
 			return builder.build();
 		}
 		
-		builder = Response.ok(entity, "application/xml");
+		builder = Response.ok(contactlist, "application/xml");
 		builder.cacheControl(cachecontrol);
 		builder.tag(etag);
 		return builder.build();
@@ -162,9 +179,10 @@ public class ContactResource {
 	public Response createContact(JAXBElement<Contact> element, @Context UriInfo uriInfo){
 		System.out.println("create contact was called");
 		Contact contact = element.getValue();
+		
 		if(dao.find(contact.getId()) == null){
+			//contact.setLastModified(Calendar.getInstance().getTime());
 			if( dao.save(contact) ){
-				dao.find(contact.getId()).setLastModified(Calendar.getInstance().getTime());
 				URI uri = uriInfo.getAbsolutePath();
 				return Response.created(uri).build();
 			}
@@ -194,11 +212,11 @@ public class ContactResource {
 			
 		if(contact.getId() == id){
 			
-			EntityTag etag = new EntityTag(Integer.toString(contact.hashCode()));
-			Date timestamp = contact.getLastModified();
+			EntityTag etag = new EntityTag(contact.createMD5());
+			//Date timestamp = contact.getLastModified();
 			System.out.println("Contact is "+ contact.getId());
-			System.out.println("Timestamp is "+timestamp);
-			ResponseBuilder builder = request.evaluatePreconditions(timestamp, etag);
+			//System.out.println("Timestamp is "+contact.getLastModified()+"");
+			ResponseBuilder builder = request.evaluatePreconditions(etag);
 			
 			if(builder != null){
 				return builder.build();
