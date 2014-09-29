@@ -1,6 +1,7 @@
 package contact.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * such as a nickname or company name.
  * 
  *@author Supavit 5510546671
- *@version 2014.09.22
+ *@version 2014.09.28
  * 
  */
 @Entity
@@ -39,6 +40,9 @@ public class Contact implements Serializable {
 	private String email;
 	/** URL of photo */
 	private String photoUrl;
+	
+	@XmlElement(name="Last-Modified")
+	private Date lastModified;
 	
 	public Contact() { }
 	
@@ -137,5 +141,13 @@ public class Contact implements Serializable {
 	 */
 	private static boolean isEmpty(String arg) {
 		return arg == null || arg.matches("\\s*") ;
+	}
+
+	public Date getLastModified() {
+		return this.lastModified;
+	}
+
+	public void setLastModified(Date lastModified) {
+		this.lastModified = lastModified;
 	}
 }

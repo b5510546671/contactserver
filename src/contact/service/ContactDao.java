@@ -1,5 +1,6 @@
 package contact.service;
 
+import java.util.Date;
 import java.util.List;
 
 import contact.entity.Contact;
@@ -62,5 +63,11 @@ public interface ContactDao {
 	 * Remove all elements in the memory.
 	 */
 	public abstract void removeAll();
+	
+	/**
+	 * Getting the last modified date of a contact using id.
+	 * @param id the id of a contact
+	 */
+	public abstract Date getLastModifiedById(long id);
 
 }

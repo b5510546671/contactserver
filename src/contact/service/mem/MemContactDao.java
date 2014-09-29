@@ -135,4 +135,12 @@ public class MemContactDao implements ContactDao {
 			delete(c.getId());
 		}
 	}
+
+	/**
+	 * @see contact.service.ContactDao#getLastModifiedById(long)
+	 */
+	@Override
+	public Date getLastModifiedById(long id) {
+		return find(id).getLastModified();
+	}
 }

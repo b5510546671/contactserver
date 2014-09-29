@@ -1,6 +1,7 @@
 package contact.service.jpa;
 
 import java.io.FileNotFoundException;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -163,6 +164,14 @@ public class JpaContactDao implements ContactDao{
 				delete(c.getId());
 			}
 
+	}
+	
+	/**
+	 * @see contact.service.ContactDao#getLastModifiedById(long)
+	 */
+	@Override
+	public Date getLastModifiedById(long id) {
+		return find(id).getLastModified();
 	}
 
 }
