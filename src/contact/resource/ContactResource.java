@@ -264,6 +264,7 @@ public class ContactResource {
 			
 			ResponseBuilder builder = request.evaluatePreconditions(etag);
 			if(builder != null){
+				builder.cacheControl(cachecontrol);
 				return builder.build();
 			}
 			
@@ -272,7 +273,8 @@ public class ContactResource {
 				URI uri = uriInfo.getAbsolutePath();
 				
 				builder = Response.created(uri);
-				
+				builder.cacheControl(cachecontrol);
+				builder.tag(etag);
 				return builder.build();
 			}
 			else{
@@ -298,7 +300,8 @@ public class ContactResource {
 		System.out.println("update contact was called");
 		
 		Contact contact = element.getValue();
-			
+		System.out.println("..."+ contact.getId() + "....");
+		System.out.println("---" + id + "----");
 		if(contact.getId() == id){
 			
 			EntityTag etag = new EntityTag(contact.createMD5());
@@ -330,6 +333,7 @@ public class ContactResource {
 			}
 		}
 		else{
+			System.out.println("---Content Not Found----");
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 		return null;
