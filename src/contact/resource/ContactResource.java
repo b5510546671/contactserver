@@ -32,7 +32,7 @@ import contact.service.mem.MemDaoFactory;
  * It replies using HTTP status codes responses.
  * 
  * @author Supavit 5510546671
- * @version 2014.09.29
+ * @version 2014.10.04
  */
 @Path("/contacts")
 @Singleton
@@ -55,15 +55,16 @@ public class ContactResource {
 		
 		dao = DaoFactory.getInstance().getContactDao();
 		
-		System.out.println("Initializing ContactResource");
 	}
 	
 	/**
-	 * Get all contacts from database.
-	 * @return HTTP status code whether OK or not found
+	 * Get all contacts from the database.
+	 * @param match data from parameter If-Match
+	 * @param noneMatch data from parameter If-None-Match
+	 * @param request the request from client
+	 * @return HttpStatus codes or new Data
 	 */
 	public Response getContacts(@HeaderParam("If-Match") String match, @HeaderParam("If-None-Match") String noneMatch, @Context Request request){
-		System.out.println("Get Contacts was called");
 		ContactList contactlist = new ContactList();
 		contactlist.setContactList(dao.findAll());
 		//GenericEntity<List<Contact>> entity = new GenericEntity<List<Contact>>(contactList){};
@@ -75,38 +76,21 @@ public class ContactResource {
 		
 		if(match == null && noneMatch == null){
 			return replyInformationWithGet(etag, request, cachecontrol, contactlist);
-//			ResponseBuilder builder = request.evaluatePreconditions(etag); 
-//			
-//			if(builder != null){
-//				builder.cacheControl(cachecontrol);
-//				return builder.build();
-//			}
-//			
-//			builder = Response.ok(contactlist, "application/xml");
-//			builder.cacheControl(cachecontrol);
-//			builder.tag(etag);
-//			return builder.build();
 		}
 		if(match != null && noneMatch != null){
 			return Response.status(Response.Status.BAD_REQUEST).build(); 
 		}
 		
 		if(match != null){
+			System.out.println("match is "+ match);
+			System.out.println("contactlist.createMD5 is " + contactlist.createMD5());
 			if(match.equals(contactlist.createMD5())){
-				return replyInformationWithGet(etag, request, cachecontrol, contactlist);
-//				ResponseBuilder builder = request.evaluatePreconditions(etag); 
-//				
-//				if(builder != null){
-//					builder.cacheControl(cachecontrol);
-//					return builder.build();
-//				}
-//				
-//				builder = Response.ok(contactlist, "application/xml");
-//				builder.cacheControl(cachecontrol);
-//				builder.tag(etag);
-//				return builder.build();
+				return Response.status(Response.Status.NOT_MODIFIED).build();
+//				return replyInformationWithGet(etag, request, cachecontrol, contactlist);
+
 			}
 			else{
+				System.out.println("---Print from precondition failed");
 				return Response.status(Response.Status.PRECONDITION_FAILED).build();
 			}
 		}
@@ -116,17 +100,6 @@ public class ContactResource {
 		if(noneMatch != null){
 			if(!noneMatch.equals(contactlist.createMD5())){
 				return replyInformationWithGet(etag, request, cachecontrol, contactlist);
-//				ResponseBuilder builder = request.evaluatePreconditions(etag); 
-//				
-//				if(builder != null){
-//					builder.cacheControl(cachecontrol);
-//					return builder.build();
-//				}
-//				
-//				builder = Response.ok(contactlist, "application/xml");
-//				builder.cacheControl(cachecontrol);
-//				builder.tag(etag);
-//				return builder.build();
 			}
 			else{
 				return Response.status(Response.Status.NOT_MODIFIED).build(); 
@@ -136,21 +109,22 @@ public class ContactResource {
 			
 		}
 		
-		System.out.println("nnnccccs");
 		return null;
 		
 	}
 	
 	/**
 	 * Get contacts from database using id to find.
-	 * @param id the id to search
-	 * @return HTTP status code whether OK or not found
+	 * @param match data from parameter If-Match
+	 * @param noneMatch data from parameter If-None-Match
+	 * @param id the id to be searched
+	 * @param request the request from client
+	 * @return HttpStatus codes or new data
 	 */
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_XML)
 	public Response getContact(@HeaderParam("If-Match") String match, @HeaderParam("If-None-Match") String noneMatch, @PathParam("id") long id, @Context Request request){
-		System.out.println("Get contact using id was called");
 		
 		Contact contact = dao.find(id);
 		
@@ -168,7 +142,7 @@ public class ContactResource {
 		}
 		if(match != null){
 			if(match.equals(contact.createMD5())){
-				return replyInformationWithGet(etag, request, cachecontrol, contact);
+				return Response.status(Response.Status.NOT_MODIFIED).build();
 			}
 			else{
 				return Response.status(Response.Status.PRECONDITION_FAILED).build();
@@ -190,13 +164,15 @@ public class ContactResource {
 
 	/**
 	 * Get contacts from database using query string.
-	 * @param title the query string to search
-	 * @return HTTP status code  OK or not found
+	 * @param match data from parameter If-Match
+	 * @param noneMatch data from parameter If-None-Match
+	 * @param title the query string to be searched
+	 * @param request the request from client
+	 * @return HttpStatus codes or new data
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
 	public Response getContact(@HeaderParam("If-Match") String match, @HeaderParam("If-None-Match") String noneMatch, @QueryParam("title") String title, @Context Request request){
-		System.out.println("Get contact using query param was called");
 		if ( title == null ) return getContacts(match, noneMatch, request);
 		
 		ContactList contactlist = new ContactList();
@@ -219,7 +195,7 @@ public class ContactResource {
 		
 		if(match != null){
 			if(match.equals(contactlist.createMD5())){
-				return replyInformationWithGet(etag, request, cachecontrol, contactlist);
+				return Response.status(Response.Status.NOT_MODIFIED).build();
 			}
 			else{
 				return Response.status(Response.Status.PRECONDITION_FAILED).build();
@@ -247,12 +223,12 @@ public class ContactResource {
 	 * Create contact and save to the database.
 	 * @param element the input element
 	 * @param uriInfo
-	 * @return HTTP status code created, bad request, or conflict
+	 * @param request the request from client
+	 * @return HttpStatus codes or new data
 	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
 	public Response createContact(JAXBElement<Contact> element, @Context UriInfo uriInfo, @Context Request request){
-		System.out.println("create contact was called");
 		Contact contact = element.getValue();
 		
 		if(dao.find(contact.getId()) == null){
@@ -289,15 +265,17 @@ public class ContactResource {
 	
 	/**
 	 * Update contact in the database.
+	 * @param match data from parameter If-Match
+	 * @param noneMatch data from parameter If-None-Match
 	 * @param id the contact id of the person to update
 	 * @param element the input element
-	 * @return HTTP status code OK or not found
+	 * @param request the request from client
+	 * @return HttpStatus codes or new data
 	 */
 	@PUT
 	@Path("{id}")
 	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
 	public Response updateContact(@HeaderParam("If-None-Match") String noneMatch, @HeaderParam("If-Match") String match, @PathParam("id") long id, JAXBElement<Contact> element, @Context Request request){
-		System.out.println("update contact was called");
 		
 		Contact contact = element.getValue();
 		System.out.println("..."+ contact.getId() + "....");
@@ -315,6 +293,8 @@ public class ContactResource {
 			}
 			
 			if(match != null){
+				System.out.println("--PUT match is " + match);
+				System.out.println("--PUT contact.createMD5() is " + contact.createMD5());
 				if(match.equals(contact.createMD5())){
 					return replyInformationWithUpdate(etag, request, contact);
 				}
@@ -341,14 +321,15 @@ public class ContactResource {
 	
 	/**
 	 * Delete contact from the database.
+	 * @param match data from parameter If-Match
+	 * @param noneMatch data from parameter If-None-Match
 	 * @param id the contact id of the person to be deleted
-	 * @return HTTP status code OK if deleted successful
-	 * 			NOT FOUND if that contact is not found
+	 * @param request the request from client
+	 * @return HttpStatus codes or new data
 	 */
 	@DELETE
 	@Path("{id}")
 	public Response deleteContact(@HeaderParam("If-Match") String match, @HeaderParam("If-None-Match") String noneMatch, @PathParam("id") long id, @Context Request request){
-		System.out.println("delete contact was called");
 		
 		Contact contact = dao.find(id);
 		EntityTag etag = new EntityTag(contact.createMD5());
@@ -387,25 +368,45 @@ public class ContactResource {
 		}
 	}
 	
+	/**
+	 * Data to be replied when get list of contacts is called.
+	 * @param etag the etag of the contact
+	 * @param request the request from client 
+	 * @param cachecontrol
+	 * @param contactlist the requested list of contacts
+	 * @return data of the contact list
+	 */
 	public Response replyInformationWithGet(EntityTag etag, Request request, CacheControl cachecontrol, ContactList contactlist){
 		ResponseBuilder builder = request.evaluatePreconditions(etag); 
 		
 		if(builder != null){
 			builder.cacheControl(cachecontrol);
+			System.out.println("1st"+builder.build()+"");
 			return builder.build();
 		}
 		
 		builder = Response.ok(contactlist, "application/xml");
 		builder.cacheControl(cachecontrol);
 		builder.tag(etag);
+		System.out.println("2nd"+builder.build()+"");
+		
 		return builder.build();
 	}
 	
+	/**
+	 * Data to be replied when get each contact is called.
+	 * @param etag the etag of the contact
+	 * @param request the request from client 
+	 * @param cachecontrol
+	 * @param contact the requested contact
+	 * @return data of the contact
+	 */
 	public Response replyInformationWithGet(EntityTag etag, Request request, CacheControl cachecontrol, Contact contact){
 		ResponseBuilder builder = request.evaluatePreconditions(etag); 
 		
 		if(builder != null){
 			builder.cacheControl(cachecontrol);
+			
 			return builder.build();
 		}
 		
@@ -415,20 +416,37 @@ public class ContactResource {
 		return builder.build();
 	}
 	
+	/**
+	 * Data to be replied when update each contact is called.
+	 * @param etag the etag of the contact
+	 * @param request the request from client 
+	 * @param contact the requested contact
+	 * @return updated data of the contact or HttpStatus codes if updating is unsuccessful
+	 */
 	public Response replyInformationWithUpdate(EntityTag etag, Request request, Contact contact){
 		ResponseBuilder builder = request.evaluatePreconditions(etag);
 		if(builder != null){
+			System.out.println("====1st "+builder.build()+"");
 			return builder.build();
 		}
 				
 		if(dao.update(contact)){
 			builder = Response.ok();
+			System.out.println("=====2nd "+builder.build()+"");
 			return builder.build();
 		}
 		else{
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 	}
+	
+	/**
+	 * Data to be replied when delete each contact is called.
+	 * @param etag the etag of the contact
+	 * @param request the request from client 
+	 * @param contact the requested contact
+	 * @return HttpStatus codes OK if successfully deleted or Method Not Allowed if there's error
+	 */
 	public Response replyInformationWithDelete(EntityTag etag, Request request, Contact contact){
 		if(dao.delete(contact.getId())){
 			return Response.ok("Deleted").build();

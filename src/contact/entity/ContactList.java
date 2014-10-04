@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * Stores all the contacts on this contact server.
  * @author Supavit 5510546671
- * @version 2014.09.23
+ * @version 2014.09.29
  *
  */
 @XmlRootElement(name="contacts")
@@ -37,8 +37,8 @@ public class ContactList {
 	}
 	
 	/**
-	 * Create the MD5 of the contact.
-	 * @return String representation of MD5
+	 * Create the MD5 of the contact list.
+	 * @return MD5 String representation of the contact list
 	 */
 	public String createMD5(){
 		try {

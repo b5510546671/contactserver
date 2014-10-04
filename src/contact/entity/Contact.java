@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * such as a nickname or company name.
  * 
  *@author Supavit 5510546671
- *@version 2014.09.28
+ *@version 2014.10.03
  * 
  */
 @Entity
@@ -145,6 +145,7 @@ public class Contact implements Serializable {
 		this.setEmail(update.getEmail());
 		this.setPhotoUrl(update.getPhotoUrl());
 		this.setTitle(update.getTitle());
+		this.setPhoneNumber(update.getPhoneNumber());
 	}
 	
 	/**
@@ -174,8 +175,8 @@ public class Contact implements Serializable {
 	        String s = this.id + "" + this.name + this.title + this.email + this.phoneNumber + this.photoUrl;
 	        m.update(s.getBytes(), 0, s.length());
 	        BigInteger i = new BigInteger(1,m.digest());
-	        System.out.println(  String.format("%1$032x", i) );
-	        return String.format("%1$032x", i);         
+	        String md5str = String.format("%1$032x", i);
+	        return md5str;
 	    } catch (NoSuchAlgorithmException e) {
 	    	System.out.println("Error from getMd5 method");
 	        e.printStackTrace();

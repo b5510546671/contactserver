@@ -28,7 +28,7 @@ import contactserver.JettyMain;
  * Test the use of ETag whether it works correctly.
  * This test both success and fail conditions.
  * @author Supavit 5510546671
- * @version 2014.09.29
+ * @version 2014.10.03
  *
  */
 public class ETagTest {
@@ -84,7 +84,7 @@ public class ETagTest {
 	}
 	
 	@Test
-	public void testPostEtag(){
+	public void testPost(){
 		StringContentProvider cProvider = new StringContentProvider(
 				"<contact id=\"5555\">" +
 				"<title>Knot</title>" +
@@ -93,20 +93,22 @@ public class ETagTest {
 				"<phoneNumber>012345678</phoneNumber>" +
 				"</contact>");
 		try {
-			
-			
 			ContentResponse responseFromPost = httpClient.newRequest(serviceUrl).content(cProvider, "application/xml").method(HttpMethod.POST).send();
 			assertEquals("Return 201 CREATED", Status.CREATED.getStatusCode(), responseFromPost.getStatus());
-			
 			assertTrue("Test Posting ", !responseFromPost.getHeaders().get(HttpHeader.ETAG).isEmpty());
-		} catch (InterruptedException | TimeoutException | ExecutionException e) {
-			// TODO Auto-generated catch block
+		} catch (InterruptedException e){
+			e.printStackTrace();
+		}
+		catch(TimeoutException e) {
+			e.printStackTrace();
+		}
+		catch(ExecutionException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	@Test
-	public void testDeleteEtag(){
+	public void testDelete(){
 		StringContentProvider cProvider = new StringContentProvider(
 				"<contact id=\"5555\">" +
 				"<title>Knot</title>" +
@@ -115,19 +117,20 @@ public class ETagTest {
 				"<phoneNumber>012345678</phoneNumber>" +
 				"</contact>");
 		try {
-			
-			
 			ContentResponse responseFromDelete = httpClient.newRequest(serviceUrl).content(cProvider, "application/xml").method(HttpMethod.POST).send();
 			assertEquals("Return 201 CREATED", Status.CREATED.getStatusCode(), responseFromDelete.getStatus());
 			assertTrue("Test Deleting ", !responseFromDelete.getHeaders().get(HttpHeader.ETAG).isEmpty());
-		} catch (InterruptedException | TimeoutException | ExecutionException e) {
-			// TODO Auto-generated catch block
+		} catch (InterruptedException e){
+			e.printStackTrace();
+		} catch(TimeoutException e){
+			e.printStackTrace();
+		} catch(ExecutionException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	@Test
-	public void testPutEtag(){
+	public void testPut(){
 		StringContentProvider cProvider = new StringContentProvider(
 				"<contact id=\"5555\">" +
 				"<title>Tonk</title>" +
@@ -136,29 +139,29 @@ public class ETagTest {
 				"<phoneNumber>0873172537</phoneNumber>" +
 				"</contact>");
 		try {
-			
 			ContentResponse responseFromPut = httpClient.newRequest(serviceUrl).content(cProvider, "application/xml").method(HttpMethod.POST).send();
-			assertEquals("Return 201 OK", Status.CREATED.getStatusCode(), responseFromPut.getStatus());
-//			assertTrue("Test Putting ", !responseFromPut.getHeaders().get(HttpHeader.ETAG).isEmpty());
+			assertEquals("Return 201 CREATED", Status.CREATED.getStatusCode(), responseFromPut.getStatus());
 			assertTrue("Test Putting ", !httpClient.GET(serviceUrl).getContentAsString().isEmpty());
-		} catch (InterruptedException | TimeoutException | ExecutionException e) {
-			// TODO Auto-generated catch block
+		} catch (InterruptedException e){
+			e.printStackTrace();
+		} catch(TimeoutException e){
+			e.printStackTrace();
+		} catch(ExecutionException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	
 	@Test
-	public void testGetETag() throws InterruptedException {
+	public void testGet() throws InterruptedException {
 	   try {
 			ContentResponse responseFromGet = httpClient.newRequest(serviceUrl).method(HttpMethod.GET).send();
 			responseFromGet.getHeaders().get(HttpHeader.ETAG);
+			assertEquals("Return 200 OK", Status.OK.getStatusCode(), responseFromGet.getStatus());
 			assertTrue("Test Getting ", !responseFromGet.getHeaders().get(HttpHeader.ETAG).isEmpty());
 		} catch (TimeoutException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

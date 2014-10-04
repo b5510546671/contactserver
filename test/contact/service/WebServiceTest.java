@@ -1,4 +1,4 @@
-package contact.test;
+package contact.service;
 
 
 
