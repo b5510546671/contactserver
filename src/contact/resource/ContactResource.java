@@ -33,7 +33,9 @@ public class ContactResource {
 	
 	/** DAO that manages saving and getting contacts. */
 	private ContactDao dao;
-	
+
+// this is not safe in singleton.
+// could have 2 simultaneous requests using the same ContactResource object.
 	/**
 	 * URI information.
 	 */
@@ -47,7 +49,7 @@ public class ContactResource {
 	public ContactResource() throws FileNotFoundException{
 		
 		dao = DaoFactory.getInstance().getContactDao();
-		
+// remove println() before submitting code.
 		System.out.println("Initializing ContactResource");
 	}
 	
@@ -56,6 +58,7 @@ public class ContactResource {
 	 * @return HTTP status code whether OK or not found
 	 */
 	public Response getContacts(){
+// more println
 		System.out.println("Get Contacts was called");
 		List<Contact> contactList = dao.findAll();
 		GenericEntity<List<Contact>> entity = new GenericEntity<List<Contact>>(contactList){};
@@ -63,6 +66,7 @@ public class ContactResource {
 			return Response.ok(entity).build();
 		}
 		else{
+// this will never be executed. The entity is never null.
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 	}
@@ -96,9 +100,10 @@ public class ContactResource {
 	public Response getContact(@QueryParam("title") String title){
 		System.out.println("Get contact using query param was called");
 		if ( title == null ) return getContacts();
-				
+// method should be dao.findByTitle()
 		List<Contact> contactlist = dao.search(title);
 		GenericEntity<List<Contact>> entity = new GenericEntity<List<Contact>>(contactlist){};
+// its never null
 		if(entity != null){
 			return Response.ok(entity).build();
 		}
@@ -146,6 +151,8 @@ public class ContactResource {
 	public Response updateContact(@PathParam("id") long id, JAXBElement<Contact> element){
 		System.out.println("update contact was called");
 		Contact contact = element.getValue();
+// what if client doesn't set the id attribute?  Since he is specifying id in
+// in the URL it shouldn't be necessary.
 		if(contact.getId() == id){
 			if(dao.update(contact)){
 				return Response.ok().header("Location", uriInfo).build();
@@ -155,6 +162,7 @@ public class ContactResource {
 			}
 		}
 		else{
+// should be BAD REQUEST
 			return Response.status(Response.Status.NOT_FOUND).build();
 		}
 		
@@ -171,6 +179,7 @@ public class ContactResource {
 	@Path("{id}")
 	public Response deleteContact(@PathParam("id") long id){
 		System.out.println("delete contact was called");
+// check if id exists in persisted contacts
 		if(dao.delete(id)) return Response.ok("Deleted").build();
 		else{
 			return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();

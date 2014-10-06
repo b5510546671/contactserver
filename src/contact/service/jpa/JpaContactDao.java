@@ -111,6 +111,7 @@ public class JpaContactDao implements ContactDao{
 					Logger.getLogger(this.getClass().getName()).warning(e.getMessage());
 				}
 			}
+//ERROR: after rollback should return false
 		}
 		
 		return true;
