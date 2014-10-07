@@ -122,7 +122,7 @@ public class ContactResource {
 	 * @return HttpStatus codes or new data
 	 */
 	@GET
-	@Path("{id}")
+	@Path("{id: [0-9]\\d*}")
 	@Produces(MediaType.APPLICATION_XML)
 	public Response getContact(@HeaderParam("If-Match") String match, @HeaderParam("If-None-Match") String noneMatch, @PathParam("id") long id, @Context Request request){
 		
