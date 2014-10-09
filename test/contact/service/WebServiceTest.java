@@ -1,4 +1,4 @@
-package contact.test;
+package contact.service;
 
 
 
@@ -6,6 +6,8 @@ import static org.junit.Assert.*;
 
 import java.io.FileNotFoundException;
 import java.net.URI;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,15 +21,16 @@ import org.eclipse.jetty.http.HttpMethod;
 import org.eclipse.jetty.client.*;
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import contact.entity.Contact;
+import contact.server.JettyMain;
 import contact.service.ContactDao;
 import contact.service.DaoFactory;
 import contact.service.mem.MemDaoFactory;
-import contactserver.JettyMain;
 
 /**
  * Tests for Contact Service.
@@ -42,6 +45,15 @@ public class WebServiceTest {
 	private static String serviceUrl;
 	private static HttpClient httpClient;
 	private static ContactDao dao;
+	
+	StringContentProvider contactOne = new StringContentProvider(
+			"<contact>" +
+			"<title>One</title>" +
+			"<name>Numero Uno</name>" +
+			"<email>one@first.com</email>" +
+			"<phoneNumber>012345678</phoneNumber>" +
+			"</contact>");
+	
 	@BeforeClass
 	public static void before(){
 		
@@ -70,6 +82,7 @@ public class WebServiceTest {
 			httpClient = new HttpClient();
 			httpClient.start();
 			dao.removeAll();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -139,31 +152,33 @@ public class WebServiceTest {
 	 * Test PUT method with success condition (OK).
 	 */
 	@Test
-	public void testPutSuccess(){
+	public void testPutValidUpdate(){
 //		httpClient = new HttpClient();
 		try{
 //			httpClient.start();
+			
+			String url = createTestContact();
 			StringContentProvider cProvider = new StringContentProvider(
-					"<contact id=\"5000\">" +
-					"<title>Knot</title>" +
-					"<name>Supavit</name>" +
-					"<email>tester@abc.com</email>" +
+					"<contact>" +
+					"<title>Knotsupavit</title>" +
+					"<name>Knot Reloaded</name>" +
+					"<email>unlikelyemail@abc.com</email>" +
 					"<phoneNumber>012345678</phoneNumber>" +
 					"</contact>");
-			Request request = httpClient.newRequest(serviceUrl).content(cProvider, "application/xml").method(HttpMethod.PUT);
+			Request request = httpClient.newRequest(url).content(cProvider, "application/xml").method(HttpMethod.PUT);
 			ContentResponse contentResponse = request.send();
 			assertEquals("PUT with Response OK", Status.OK.getStatusCode(), contentResponse.getStatus());
 			contentResponse = httpClient.GET(serviceUrl);
 			String content = contentResponse.getContentAsString();
 			
 			Matcher matcher;
-			matcher = Pattern.compile(".*<name>Kongwudhi</name>.*").matcher(content);
+			matcher = Pattern.compile(".*<name>Knot Reloaded</name>.*").matcher(content);
 			assertTrue("Update name.", matcher.matches());
 			
 			matcher = Pattern.compile(".*<title>Knotsupavit</title>.*").matcher(content);
 			assertTrue("Update title.", matcher.matches());
 			
-			matcher = Pattern.compile(".*<email>knotsupavit@knotsupavit.com</email>.*").matcher(content);
+			matcher = Pattern.compile(".*<email>unlikelyemail@abc.com</email>.*").matcher(content);
 			assertTrue("Update email.", matcher.matches());
 			
 		}catch (Exception e) {
@@ -193,31 +208,49 @@ public class WebServiceTest {
 	
 	/**
 	 * Test GET method with OK condition (OK).
+	 * @throws Exception if cannot create test contact
 	 */
 	@Test
-	public void testGetSuccess(){
-		long id = 1;
+	public void testGetExistingContact() throws Exception {
+		String url = createTestContact();
+		
 //		httpClient = new HttpClient();
-		try{
+		
 //			httpClient.start();
-			ContentResponse contentResponse = httpClient.GET(serviceUrl+id);
+			ContentResponse contentResponse = httpClient.GET(url);
 			assertEquals("GET with Response OK", Status.OK.getStatusCode(), contentResponse.getStatus());
 			assertTrue("Content is not null", !contentResponse.getContentAsString().isEmpty());
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+			
+			// the response body must be the XML representation of a contact
+			//TODO use JAXB to create a contact from the contentResponse
+			
+		
+	}
+	
+	private String createTestContact() throws InterruptedException,
+			TimeoutException, ExecutionException {
+		Request request = httpClient.newRequest(serviceUrl).content(contactOne, "application/xml").method(HttpMethod.POST);
+		ContentResponse response = request.send();
+		Assume.assumeTrue(response.getStatus() == Status.CREATED.getStatusCode());
+		String url = response.getHeaders().get("Location");
+		assertNotNull("Created a test contact but no Loation provided", url);
+		// get the final component, which should be an id
+		return url;
 	}
 	/**
 	 * Test GET method with fail condition (NO CONTENT).
 	 */
 	@Test
-	public void testGetFail(){
+	public void testGetNonexistentContact( ) {
 //		httpClient = new HttpClient();
 		try{
 //			httpClient.start();
 			ContentResponse contentResponse = httpClient.GET(serviceUrl);
-			assertEquals("GET with Response NO CONTENT", Status.NO_CONTENT.getStatusCode(), contentResponse.getStatus());
-			assertTrue("Content is null", contentResponse.getContentAsString().isEmpty());
+			assertEquals("GET with Response NO CONTENT", Status.OK.getStatusCode(), contentResponse.getStatus());
+			contentResponse = httpClient.GET(serviceUrl + "/999999999");
+			assertEquals("GET with Response NOT FOUND", Status.NOT_FOUND.getStatusCode(), contentResponse.getStatus());
+// This test is not relevant.
+//			assertTrue("Content is null", contentResponse.getContentAsString().isEmpty());
 		}catch(Exception e){
 			e.printStackTrace();
 		}

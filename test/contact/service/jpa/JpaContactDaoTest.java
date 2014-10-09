@@ -12,9 +12,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import contact.entity.Contact;
+import contact.server.JettyMain;
 import contact.service.ContactDao;
 import contact.service.jpa.JpaDaoFactory;
-import contactserver.JettyMain;
 
 /**
  * A few really basic tests of JPA using the JPA DAO.

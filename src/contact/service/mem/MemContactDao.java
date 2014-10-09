@@ -131,8 +131,9 @@ public class MemContactDao implements ContactDao {
 	 */
 	@Override
 	public void removeAll() {
-		for(Contact c : findAll()){
-			delete(c.getId());
-		}
+//		for(Contact c : findAll()){
+//			delete(c.getId());
+//		}
+		contacts.clear();
 	}
 }

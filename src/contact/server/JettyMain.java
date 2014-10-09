@@ -1,4 +1,4 @@
-package contactserver;
+package contact.server;
 
 import java.net.URI;
 import java.net.URL;

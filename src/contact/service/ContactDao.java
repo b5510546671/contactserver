@@ -27,7 +27,7 @@ public interface ContactDao {
 
 	/**
 	 * Find all contacts in the database.
-	 * @return list of all contacts
+	 * @return list of all contacts, which may be empty but not null.
 	 */
 	public abstract List<Contact> findAll();
 

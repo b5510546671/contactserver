@@ -3,6 +3,7 @@ package contact.resource;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.util.*;
+import java.util.logging.Logger;
 
 import javax.inject.Singleton;
 import javax.persistence.Entity;
@@ -11,6 +12,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
@@ -30,6 +32,15 @@ import contact.service.mem.MemDaoFactory;
 @Path("/contacts")
 @Singleton
 public class ContactResource {
+	private static final Response NOT_FOUND = Response.status(Response.Status.NOT_FOUND).build();
+
+	// create a logger for logging messages.
+	// this logger uses the java.util.logging facility.
+	// We only need one logger for each class, so make it static.
+	private static Logger logger;
+	static {
+		logger = Logger.getLogger(ContactResource.class.getName());
+	}
 	
 	/** DAO that manages saving and getting contacts. */
 	private ContactDao dao;
@@ -50,7 +61,7 @@ public class ContactResource {
 		
 		dao = DaoFactory.getInstance().getContactDao();
 // remove println() before submitting code.
-		System.out.println("Initializing ContactResource");
+		logger.info("Initializing ContactResource");
 	}
 	
 	/**
@@ -59,7 +70,7 @@ public class ContactResource {
 	 */
 	public Response getContacts(){
 // more println
-		System.out.println("Get Contacts was called");
+		logger.info("Get Contacts was called");
 		List<Contact> contactList = dao.findAll();
 		GenericEntity<List<Contact>> entity = new GenericEntity<List<Contact>>(contactList){};
 		if(entity != null){
@@ -67,7 +78,7 @@ public class ContactResource {
 		}
 		else{
 // this will never be executed. The entity is never null.
-			return Response.status(Response.Status.NOT_FOUND).build();
+			return NOT_FOUND;
 		}
 	}
 	
@@ -80,10 +91,10 @@ public class ContactResource {
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_XML)
 	public Response getContact(@PathParam("id") long id){
-		System.out.println("Get contact using id was called");
+		logger.info("Get contact using id was called");
 		Contact contact = dao.find(id);
 		if(contact == null){
-			return Response.status(Response.Status.NOT_FOUND).build();
+			return NOT_FOUND;
 		}
 		else{
 			return Response.ok(contact).build();
@@ -98,7 +109,7 @@ public class ContactResource {
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
 	public Response getContact(@QueryParam("title") String title){
-		System.out.println("Get contact using query param was called");
+		logger.info("Get contact using query param was called");
 		if ( title == null ) return getContacts();
 // method should be dao.findByTitle()
 		List<Contact> contactlist = dao.search(title);
@@ -108,7 +119,7 @@ public class ContactResource {
 			return Response.ok(entity).build();
 		}
 		else{
-			return Response.status(Response.Status.NOT_FOUND).build();
+			return NOT_FOUND;
 
 		}
 	}
@@ -122,11 +133,11 @@ public class ContactResource {
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
 	public Response createContact(JAXBElement<Contact> element, @Context UriInfo uriInfo){
-		System.out.println("create contact was called");
+		logger.info("create contact was called");
 		Contact contact = element.getValue();
 		if(dao.find(contact.getId()) == null){
 			if( dao.save(contact) ){
-				URI uri = uriInfo.getAbsolutePath();
+				URI uri = uriInfo.getAbsolutePathBuilder().path( Long.toString(contact.getId()) ).build();
 				return Response.created(uri).build();
 			}
 			else{
@@ -148,24 +159,24 @@ public class ContactResource {
 	@PUT
 	@Path("{id}")
 	@Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-	public Response updateContact(@PathParam("id") long id, JAXBElement<Contact> element){
+	public Response updateContact(@PathParam("id") long id, Contact contact){
 		System.out.println("update contact was called");
-		Contact contact = element.getValue();
+		
+		//Contact contact = element.getValue();
 // what if client doesn't set the id attribute?  Since he is specifying id in
 // in the URL it shouldn't be necessary.
-		if(contact.getId() == id){
-			if(dao.update(contact)){
-				return Response.ok().header("Location", uriInfo).build();
-			}
-			else{
-				return Response.status(Response.Status.NOT_FOUND).build();
-			}
-		}
-		else{
-// should be BAD REQUEST
-			return Response.status(Response.Status.NOT_FOUND).build();
+		if (contact.getId() == 0) contact.setId(id);
+		if(contact.getId() != id) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 		
+		if(dao.update(contact)){
+			return Response.ok().header("Location", uriInfo).build();
+		}
+		else{
+			return NOT_FOUND;
+		}
+
 		
 	}
 	
@@ -180,8 +191,9 @@ public class ContactResource {
 	public Response deleteContact(@PathParam("id") long id){
 		System.out.println("delete contact was called");
 // check if id exists in persisted contacts
-		if(dao.delete(id)) return Response.ok("Deleted").build();
-		else{
+		if (dao.find(id)==null) return Response.status(Status.NOT_FOUND).build();
+		if (dao.delete(id)) return Response.ok(/*"Deleted"*/).build();
+		else {
 			return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
 		}
 	}

@@ -38,21 +38,7 @@ public class JpaContactDao implements ContactDao{
 		//createTestContact( );
 	}
 	
-	/** add contacts for testing. */
-	private void createTestContact( ) {
-		long id = 101; // usually we should let JPA set the id
-		if (find(id) == null) {
-			Contact test = new Contact("Test contact", "Joe Experimental", "none@testing.com");
-			test.setId(id);
-			save(test);
-		}
-		id++;
-		if (find(id) == null) {
-			Contact test2 = new Contact("Another Test contact", "Testosterone", "testee@foo.com");
-			test2.setId(id);
-			save(test2);
-		}
-	}
+	// createTestContact( ) belongs someplace else.
 	
 	/**
 	 * @see contact.service.ContactDao#find(long)
@@ -102,7 +88,7 @@ public class JpaContactDao implements ContactDao{
 			em.remove(contactObj);
 			tx.commit();
 			return true;
-		}catch(EntityExistsException ex){
+		} catch(EntityExistsException ex){
 			Logger.getLogger(this.getClass().getName()).warning(ex.getMessage());
 			if(tx.isActive()){
 				try{
@@ -111,7 +97,6 @@ public class JpaContactDao implements ContactDao{
 					Logger.getLogger(this.getClass().getName()).warning(e.getMessage());
 				}
 			}
-//ERROR: after rollback should return false
 		}
 		
 		return true;
@@ -160,9 +145,9 @@ public class JpaContactDao implements ContactDao{
 	 */
 	@Override
 	public void removeAll() {
-			for(Contact c : findAll()){
-				delete(c.getId());
-			}
+		for(Contact c : findAll()){
+			delete(c.getId());
+		}
 
 	}
 

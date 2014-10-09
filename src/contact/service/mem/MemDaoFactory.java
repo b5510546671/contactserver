@@ -12,6 +12,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import contact.Config;
 import contact.entity.Contact;
 import contact.entity.ContactList;
 import contact.service.ContactDao;
@@ -28,13 +29,15 @@ import contact.service.jpa.JpaDaoFactory;
  */
 public class MemDaoFactory extends DaoFactory {
 	
+	private static final String CONTACTS_FILE = Config.getWritableContactsFile();
+	
 	/** instance of the entity DAO */
 	private ContactDao daoInstance;
 	
 	public MemDaoFactory() throws FileNotFoundException {
 		System.out.println("Create daoInstance.");
 		daoInstance = new MemContactDao();
-		loadFromFile("C://Users/knotsupavit/Desktop/build.xml");
+		loadFromFile(CONTACTS_FILE);
 	}
 	
 	/**
@@ -51,22 +54,25 @@ public class MemDaoFactory extends DaoFactory {
 	 */
 	public void loadFromFile(String fileLocator) throws FileNotFoundException{
 		System.out.println("Load from file is called");
+		ContactList ctlist = null;
+		File inputFile = new File(fileLocator);
+		if ( ! inputFile.exists() ) return;
 		
-		try{
-			File inputFile = new File(fileLocator);
+		try {
 			Unmarshaller unmarshaller = JAXBContext.newInstance(ContactList.class).createUnmarshaller();
-			ContactList ctlist = (ContactList) unmarshaller.unmarshal(inputFile);
-			
-			if(ctlist != null){
-				List<Contact> contactList = ctlist.getContactList();
-				
-				for(Contact contact : contactList){
-					daoInstance.save(contact);
-				}
-			}
-		}catch(JAXBException jax){
-			jax.printStackTrace();
+			ctlist = (ContactList) unmarshaller.unmarshal(inputFile);
+		}catch(JAXBException jax) {
+			System.err.println(jax);
 		}
+		if(ctlist != null) {
+			List<Contact> contactList = ctlist.getContactList();
+			
+			for(Contact contact : contactList){
+				daoInstance.save(contact);
+			}
+		}
+		
+		
 	}
 	
 	
@@ -89,7 +95,7 @@ public class MemDaoFactory extends DaoFactory {
 			}
 			ContactList contact = new ContactList();
 			contact.setContactList(daoInstance.findAll());
-			File file = new File("C://Users/knotsupavit/Desktop/build.xml");
+			File file = new File(CONTACTS_FILE);
 			FileOutputStream fileoutput = new FileOutputStream(file);
 			Marshaller jaxbMarshaller = JAXBContext.newInstance(ContactList.class).createMarshaller();
 			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
