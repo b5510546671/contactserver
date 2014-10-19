@@ -1,4 +1,4 @@
-package contact.server;
+package contactserver;
 
 import java.net.URI;
 import java.net.URL;
@@ -168,4 +168,3 @@ public class JettyMain {
 	}
 	
 }
-

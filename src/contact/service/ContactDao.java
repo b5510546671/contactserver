@@ -1,5 +1,6 @@
 package contact.service;
 
+import java.util.Date;
 import java.util.List;
 
 import contact.entity.Contact;
@@ -23,7 +24,7 @@ public interface ContactDao {
 	 * @param querystr string used for searching
 	 * @return list of all contacts
 	 */
-	public abstract List<Contact> search(String querystr);
+	public abstract List<Contact> findByTitle(String querystr);
 
 	/**
 	 * Find all contacts in the database.
@@ -62,5 +63,6 @@ public interface ContactDao {
 	 * Remove all elements in the memory.
 	 */
 	public abstract void removeAll();
+	
 
 }

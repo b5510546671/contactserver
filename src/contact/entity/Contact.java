@@ -1,6 +1,10 @@
 package contact.entity;
 
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,7 +22,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * such as a nickname or company name.
  * 
  *@author Supavit 5510546671
- *@version 2014.09.22
+ *@version 2014.10.03
  * 
  */
 @Entity
@@ -40,13 +44,16 @@ public class Contact implements Serializable {
 	/** URL of photo */
 	private String photoUrl;
 	
+	private String phoneNumber;
+	
 	public Contact() { }
 	
-	public Contact(String title, String name, String email ) {
+	public Contact(String title, String name, String email, String phoneNumber ) {
 		this.title = title;
 		this.name = name;
 		this.email = email;
 		this.photoUrl = "";
+		this.setPhoneNumber(phoneNumber);
 	}
 
 	public Contact(long id) {
@@ -60,7 +67,14 @@ public class Contact implements Serializable {
 	public void setPhotoUrl(String photo) {
 		this.photoUrl = photo;
 	}
+	
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
 
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
   
 	public String getName() {
 		return name;
@@ -128,6 +142,7 @@ public class Contact implements Serializable {
 		this.setEmail(update.getEmail());
 		this.setPhotoUrl(update.getPhotoUrl());
 		this.setTitle(update.getTitle());
+		this.setPhoneNumber(update.getPhoneNumber());
 	}
 	
 	/**
@@ -138,4 +153,25 @@ public class Contact implements Serializable {
 	private static boolean isEmpty(String arg) {
 		return arg == null || arg.matches("\\s*") ;
 	}
+	
+	/**
+	 * Create the MD5 of the contact.
+	 * @return String representation of MD5
+	 */
+	public String createMD5(){
+		try {
+	        MessageDigest m = MessageDigest.getInstance("MD5");
+	        String s = this.id + "" + this.name + this.title + this.email + this.phoneNumber + this.photoUrl;
+	        m.update(s.getBytes(), 0, s.length());
+	        BigInteger i = new BigInteger(1,m.digest());
+	        String md5str = String.format("%1$032x", i);
+	        return md5str;
+	    } catch (NoSuchAlgorithmException e) {
+	    	System.out.println("Error from getMd5 method");
+	        e.printStackTrace();
+	    }
+	    return null;
+	}
+
+	
 }

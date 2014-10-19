@@ -12,6 +12,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.core.Response.Status;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.client.api.ContentResponse;
@@ -27,7 +32,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import contact.entity.Contact;
-import contact.server.JettyMain;
+import contactserver.JettyMain;
 import contact.service.ContactDao;
 import contact.service.DaoFactory;
 import contact.service.mem.MemDaoFactory;
@@ -223,8 +228,10 @@ public class WebServiceTest {
 			
 			// the response body must be the XML representation of a contact
 			//TODO use JAXB to create a contact from the contentResponse
-			
-		
+			JAXBContext ctx = JAXBContext.newInstance("Marshaller");
+			Marshaller m = ctx.createMarshaller();
+			XMLStreamWriter writer =  XMLOutputFactory.newInstance().createXMLStreamWriter();
+			m.marshal(contentResponse, writer);
 	}
 	
 	private String createTestContact() throws InterruptedException,

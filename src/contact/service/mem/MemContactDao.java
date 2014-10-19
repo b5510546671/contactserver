@@ -34,7 +34,7 @@ public class MemContactDao implements ContactDao {
 	
 	/** add a single contact with given id for testing. */
 	private void createTestContact(long id) {
-		Contact test = new Contact("Test contact", "Joe Experimental", "none@testing.com");
+		Contact test = new Contact("Test contact", "Joe Experimental", "none@testing.com", "0849587361");
 		test.setId(id);
 		contacts.add(test);
 	}
@@ -53,7 +53,7 @@ public class MemContactDao implements ContactDao {
 	 * @see contact.service.ContactDao#search(java.lang.String)
 	 */
 	@Override
-	public List<Contact> search(String querystr){
+	public List<Contact> findByTitle(String querystr){
 		List<Contact> contactlist = new ArrayList<Contact>();
 		for ( Contact contact : contacts ) {
 			 if ( contact.getTitle().toLowerCase().contains(querystr.toLowerCase()) ){

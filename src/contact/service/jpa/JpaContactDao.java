@@ -1,6 +1,7 @@
 package contact.service.jpa;
 
 import java.io.FileNotFoundException;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -53,14 +54,14 @@ public class JpaContactDao implements ContactDao{
 	 * @see contact.service.ContactDao#search(java.lang.String)
 	 */
 	@Override
-	public List<Contact> search(String querystr) {
+	public List<Contact> findByTitle(String querystr) {
 		// LIKE does string match using patterns.
 		Query query = em.createQuery("select c from Contact c where LOWER(c.title) LIKE :title");
 		// % is wildcard that matches anything
 		query.setParameter("title", "%"+querystr.toLowerCase()+"%");
-		// now why bother to copy one list to another list?
-		java.util.List<Contact> result = Lists.newArrayList( query.getResultList() );
-		return result;
+
+		return Lists.newArrayList( query.getResultList() );
+		
 	}
 
 	/**

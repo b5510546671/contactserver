@@ -12,7 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import contact.entity.Contact;
-import contact.server.JettyMain;
+import contactserver.JettyMain;
 import contact.service.ContactDao;
 import contact.service.jpa.JpaDaoFactory;
 
@@ -57,7 +57,7 @@ public class JpaContactDaoTest {
 
 	@Test
 	public void testSaveAndFind() {
-		foo = new Contact("foo title", "Foo Bar", "foo@bar.com");
+		foo = new Contact("foo title", "Foo Bar", "foo@bar.com", "0987625143");
 		assertTrue( contactDao.save(foo) );
 		assertTrue( foo.getId() > 0 );
 		System.out.println("Saved foo and got foo.id = "+foo.getId());
