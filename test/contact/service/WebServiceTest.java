@@ -229,9 +229,9 @@ public class WebServiceTest {
 			// the response body must be the XML representation of a contact
 			//TODO use JAXB to create a contact from the contentResponse
 			JAXBContext ctx = JAXBContext.newInstance("Marshaller");
-			Marshaller m = ctx.createMarshaller();
-			XMLStreamWriter writer =  XMLOutputFactory.newInstance().createXMLStreamWriter();
-			m.marshal(contentResponse, writer);
+			//Marshaller m = ctx.createMarshaller();
+			//XMLStreamWriter writer =  XMLOutputFactory.newInstance().createXMLStreamWriter();
+			//m.marshal(contentResponse, writer);
 	}
 	
 	private String createTestContact() throws InterruptedException,
